@@ -70,24 +70,15 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    string s;
-    cin >> s;
-    ll i = 0;
-    while (i < s.length()) {
-        if (i + 2 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4' && s[i + 2] == '4') i += 3;
-        else if (i + 1 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4') i += 2;
-        else if (s[i] == '1') i++;
-        else {
-            no();
-            return 0;
-        }
-    }
-
-    yes();
+    solve();
 }
 
 void solve() {
-
+    string s1, s2;
+    cin >> s1 >> s2;
+    reverse(s2.begin(), s2.end());
+    if (s1 == s2) yes();
+    else no();
 }
 
 /* Main() Ends Here */

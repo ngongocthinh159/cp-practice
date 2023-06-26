@@ -34,7 +34,7 @@ void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cou
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-ll directions[8][2] = {{-1,0},{0,-1},{1,0},{0,1},{-1,-1},{1,1},{-1,1},{1,-1}};
+ll directions[8][2] = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-LEFT, RIGHT OF UP => clockwise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
 ll min(int a,ll b) { if (a<b) return a; return b; }
@@ -70,24 +70,35 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    string s;
-    cin >> s;
-    ll i = 0;
-    while (i < s.length()) {
-        if (i + 2 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4' && s[i + 2] == '4') i += 3;
-        else if (i + 1 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4') i += 2;
-        else if (s[i] == '1') i++;
-        else {
-            no();
-            return 0;
-        }
-    }
-
-    yes();
+    solve();
 }
 
 void solve() {
+    ll n, m;
+    cin >> n >> m;
+    vector<vector<char>> board(n, vector<char> (m));
+    f(i,0,n) {
+        string s;
+        cin >> s;
+        f(j,0,m) {
+            board[i][j] = s[j];
+        }
+    }
 
+    f(i,0,n) {
+        f(j,0,m) {
+            if (board[i][j] != '.') continue;
+            if ((i + j) & 1) board[i][j] = 'W';
+            else board[i][j] = 'B';
+        }
+    }
+
+    fe(str,board) {
+        fe(c,str) {
+            cout << c;
+        }
+        cout << "\n";
+    }
 }
 
 /* Main() Ends Here */

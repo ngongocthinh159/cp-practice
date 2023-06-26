@@ -63,31 +63,75 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve();
+void solveUsingDP();
+void solveUsingMedianFact();
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    string s;
-    cin >> s;
-    ll i = 0;
-    while (i < s.length()) {
-        if (i + 2 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4' && s[i + 2] == '4') i += 3;
-        else if (i + 1 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4') i += 2;
-        else if (s[i] == '1') i++;
-        else {
-            no();
-            return 0;
-        }
-    }
+    /* 
+    - Median là số giảm thiểu tối đa sự khác biệt của tổng sự khác biệt khi tính từ median.
+    - Hay nói cách khác, khi tìm 1 số X để tất cả các số trong dãy giảm về/tăng lên bằng 
+    số X đó mà yêu cầu ít sự tăng giảm nhất khi X = median.
+        + Với bộ số với số số hạng lẻ: thì chọn median.
+        + Với bộ số với số số hạng chẵn: trong khoảng 2 số chính 
+        giữa chọn số nào cũng được median 1 <= x <= median 2.
 
-    yes();
+    Chứng minh đọc thêm tại: 
+    https://math.stackexchange.com/questions/113270/the-median-minimizes-the-sum-of-absolute-deviations-the-ell-1-norm 
+    */
+    solveUsingMedianFact();
+    // solveUsingDP();
 }
 
-void solve() {
+void solveUsingMedianFact() {
+    ll n, m, d, min = LLONG_MAX, ans = 0;
+    cin >> n >> m >> d;
+    ll nums[n*m];
+    f(i,0,n*m) {
+        cin >> nums[i];
+    }
+    sort(nums, nums + n*m);
+    ll median = (n*m + 1) / 2;
+    median--;
+    median = nums[median];
+    f(i,0,n*m) {
+        if (abs(nums[i] - median) % d != 0) {
+            cout << -1 << "\n";
+            return;
+        }
+        ans+=abs(nums[i] - median)/d;
+    }
+    cout << ans << "\n";
+}
 
+void solveUsingDP() {
+    ll n, m, d, min = LLONG_MAX;
+    cin >> n >> m >> d;
+    ll nums[n*m] = {0};
+    ll prefix[n*m] = {0};
+    ll surfix[n*m] = {0};
+    f(i,0,n*m) {
+        cin >> nums[i];
+    }
+    sort(nums, nums + n*m);
+    f(i,0,n*m) {
+        prefix[i] = i == 0 ? nums[i] : nums[i] + prefix[i - 1];
+    }
+    rf(i,n*m-1,0) {
+        surfix[i] = i == n*m - 1 ? nums[i] : nums[i] + surfix[i + 1];
+    }
+    f(i,0,n*m) {
+        ll cur = surfix[i] - prefix[i] + nums[i]*(2*(i + 1) - n*m - 1); // Draw to get this formular
+        if (cur % d != 0) {
+            cout << -1 << "\n";
+            return;
+        } 
+        if (min > cur) {min = cur;}
+    }
+    cout << (int) min/d << "\n";
 }
 
 /* Main() Ends Here */

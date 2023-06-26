@@ -70,20 +70,26 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    string s;
+    ll k;
+    cin >> k;
+    string s, ans = "";
     cin >> s;
-    ll i = 0;
-    while (i < s.length()) {
-        if (i + 2 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4' && s[i + 2] == '4') i += 3;
-        else if (i + 1 <= s.length() - 1 && s[i] == '1' && s[i + 1] == '4') i += 2;
-        else if (s[i] == '1') i++;
-        else {
-            no();
+    ll count[26] = {0};
+    f(i,0,s.length()) {
+        count[s[i] - 'a']++;
+    }
+    f(i,0,26) {
+        if (count[i] > 0 && count[i] % k != 0) {
+            cout << -1 << "\n";
             return 0;
+        } else if (count[i] > 0) {
+            f(j,0,count[i]/k) {
+                ans += i + 'a';
+            }
         }
     }
 
-    yes();
+    f(i,0,k) cout << ans;
 }
 
 void solve() {
