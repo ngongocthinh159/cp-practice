@@ -34,7 +34,7 @@ void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cou
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-ll directions[8][2] = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From dir[4] Right of Up then clock wise
+ll directions[8][2] = {{-1,0},{0,-1},{1,0},{0,1},{-1,-1},{1,1},{-1,1},{1,-1}};
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
 ll min(int a,ll b) { if (a<b) return a; return b; }
@@ -47,13 +47,6 @@ string to_lower(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='A' && a
 string int_to_string(ll a) { char x[100]; sprintf(x, "%lld", a); string s = x; return s; }
 ll string_to_int(string a) { char x[100]; ll res; strcpy(x, a.c_str()); sscanf(x, "%lld", &res); return res; }
 bool prime(ll a) { if (a==1) return 0; for (int i=2;i<=round(sqrt(a));++i) if (a%i==0) return 0; return 1; }
-ll mod(ll x) { return (((x%MOD) + MOD) % MOD); }
-ll addMod(ll a, ll b) { return mod(mod(a) + mod(b)); }
-ll subMod(ll a, ll b) { return mod(mod(a) - mod(b)); }
-ll mulMod(ll a, ll b) { return mod(mod(a) * mod(b)); }
-ll powMod(ll x, ll n) { if (n == 0) return 1%MOD; ll u = powMod(mod(x),n/2); u = (u*u)%MOD; if (n%2 == 1) u = (u*(mod(x)))%MOD; return u; } // (x^n)%MOD
-ll inverseMod(ll a) { if (gcd(a, MOD) != 1) return -1; return powMod(mod(a), MOD-2); } // Return -1 if ((1/a)%MOD) not exist (a and MOD not coprime)
-ll divMod(ll a, ll b) { ll tmp = inverseMod(b); if (tmp == -1) return -1; return (((mod(a))*inverseMod(mod(b)))%MOD); } // Return -1 if ((1/b)%MOD) not exist (b and MOD not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
 void OPEN(string s) {
@@ -77,16 +70,21 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    string s;
+    ll dp[26] = {0};
+    cin >> s;
+    ll odd = 0;
+    f(i,0,s.length()) {
+        dp[s[i] - 'a']++;
+        if (dp[s[i] - 'a'] % 2 == 0) odd--;
+        else odd++;
+    }
+    if (odd <= 1) {cout << "First\n"; return;}
+    cout << ((odd - 1) % 2 == 0 ? "First\n" : "Second\n");
 }
 
 /* Main() Ends Here */

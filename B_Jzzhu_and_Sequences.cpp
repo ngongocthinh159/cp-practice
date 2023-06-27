@@ -5,7 +5,6 @@ using namespace std;
 
 /* TYPES  */
 #define ll long long
-#define ull unsigned long long
 #define pii pair<int, int>
 #define pll pair<long long, long long>
 #define vi vector<int>
@@ -17,7 +16,11 @@ using namespace std;
 /* FUNCTIONS */
 #define f(i,s,e) for(long long int i=s;i<e;i++)
 #define cf(i,s,e) for(long long int i=s;i<=e;i++)
-#define rf(i,e,s) for(long long int i=e-1;i>=s;i--)
+#define rf(i,e,s) for(long long int i=e;i>=s;i--)
+#define fe(a, b) for (auto&(a) : (b))
+#define fi first
+#define se second
+#define mp make_pair
 #define pb push_back
 #define eb emplace_back
 
@@ -28,18 +31,34 @@ void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cou
 /* UTILS */
 #define MOD 1000000007
 #define PI 3.1415926535897932384626433832795
+double EPS = 1e-9;
+int INF = 1000000005;
+long long INFF = 1000000000000000005LL;
+ll directions[8][2] = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From dir[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
 ll min(int a,ll b) { if (a<b) return a; return b; }
 ll max(ll a,int b) { if (a>b) return a; return b; }
 ll max(int a,ll b) { if (a>b) return a; return b; }
-ll gcd(ll a,ll b) { if (b==0) return a; return gcd(b, a%b); }
-ll lcm(ll a,ll b) { return a/gcd(a,b)*b; }
+ll gcd(ll a,ll b) { if (b==0) return a; return gcd(b, a%b); } // Greatest common divisor (Uoc chung lon nhat): O(log(min(a,b))
+ll lcm(ll a,ll b) { return a/gcd(a,b)*b; } // Lowest common mutiple (Boi chung nho nhat): O(log(min(a,b))
 string to_upper(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='a' && a[i]<='z') a[i]-='a'-'A'; return a; }
 string to_lower(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='A' && a[i]<='Z') a[i]+='a'-'A'; return a; }
+string int_to_string(ll a) { char x[100]; sprintf(x, "%lld", a); string s = x; return s; }
+ll string_to_int(string a) { char x[100]; ll res; strcpy(x, a.c_str()); sscanf(x, "%lld", &res); return res; }
 bool prime(ll a) { if (a==1) return 0; for (int i=2;i<=round(sqrt(a));++i) if (a%i==0) return 0; return 1; }
+ll mod(ll x) { return (((x%MOD) + MOD) % MOD); }
+ll addMod(ll a, ll b) { return mod(mod(a) + mod(b)); }
+ll subMod(ll a, ll b) { return mod(mod(a) - mod(b)); }
+ll mulMod(ll a, ll b) { return mod(mod(a) * mod(b)); }
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
+void OPEN(string s) {
+#ifndef TESTING
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+#endif
+}
 
 /*  All Required define Pre-Processors and typedef Constants */
 typedef long int int32;
@@ -48,23 +67,28 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+void solve();
 
 /* Main()  function */
-int main() {    
-    string s1 = "aaa";
-    string s2 = "bbb";
-    string *tmp1 = &s1;
-    string *tmp2 = &s2;
-    char temp = (*tmp1)[1];
-    (*tmp1)[1] = (*tmp2)[1];
-    (*tmp2)[1] = temp;
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    
+    solve();
+}
 
-    // cout << &s1 << endl;
-    cout << s1 << endl;
-    cout << s2 << endl;
-    // cout << (*tmp1)[0] << endl;
-
-    return 0;
+void solve() {
+    ll a, b, n;
+    cin >> a >> b >> n;
+    ll f[7];
+    f[1] = mod(a);
+    f[2] = mod(b);
+    cf(i,3,6) {
+        f[i] = subMod(f[i - 1], f[i - 2]);
+    }
+    ll tmp = n % 6;
+    if (tmp == 0) cout << f[6] << "\n";
+    else cout << f[tmp] << "\n";
 }
 
 /* Main() Ends Here */

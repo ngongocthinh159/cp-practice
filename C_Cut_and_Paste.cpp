@@ -71,7 +71,7 @@ typedef unsigned long long int  uint64;
 
 /* clang-format on */
 void solve();
-
+ll dp[(int) 1e6 + 1] = {-1};
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
@@ -86,7 +86,32 @@ int main() {
 }
 
 void solve() {
+    ll t, length = -1, nextLength = -1, p;
+    cin >> t;
+    string s;
+    cin >> s;
+    p = s.length() + 1; // DP pointer, stop when p reach t
+    cf(i,1,s.length()) {
+        dp[i] = s[i - 1] - '0';
+    }
+    cf(i,1,t) {
+        ll rep = dp[i];
+        length = i == 1 ? s.length() : nextLength;
+        nextLength = addMod(i, mulMod(length - i, rep));
 
+        if (p > t) {continue;}
+
+        f(k,0,rep-1) {
+            f(m,i+1,length+1) {
+                dp[p] = dp[m];
+                p++;
+                if (p > t) break;
+            }
+            if (p > t) break;
+        }
+    }
+
+    cout << nextLength << "\n";
 }
 
 /* Main() Ends Here */

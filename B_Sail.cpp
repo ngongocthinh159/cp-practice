@@ -47,13 +47,6 @@ string to_lower(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='A' && a
 string int_to_string(ll a) { char x[100]; sprintf(x, "%lld", a); string s = x; return s; }
 ll string_to_int(string a) { char x[100]; ll res; strcpy(x, a.c_str()); sscanf(x, "%lld", &res); return res; }
 bool prime(ll a) { if (a==1) return 0; for (int i=2;i<=round(sqrt(a));++i) if (a%i==0) return 0; return 1; }
-ll mod(ll x) { return (((x%MOD) + MOD) % MOD); }
-ll addMod(ll a, ll b) { return mod(mod(a) + mod(b)); }
-ll subMod(ll a, ll b) { return mod(mod(a) - mod(b)); }
-ll mulMod(ll a, ll b) { return mod(mod(a) * mod(b)); }
-ll powMod(ll x, ll n) { if (n == 0) return 1%MOD; ll u = powMod(mod(x),n/2); u = (u*u)%MOD; if (n%2 == 1) u = (u*(mod(x)))%MOD; return u; } // (x^n)%MOD
-ll inverseMod(ll a) { if (gcd(a, MOD) != 1) return -1; return powMod(mod(a), MOD-2); } // Return -1 if ((1/a)%MOD) not exist (a and MOD not coprime)
-ll divMod(ll a, ll b) { ll tmp = inverseMod(b); if (tmp == -1) return -1; return (((mod(a))*inverseMod(mod(b)))%MOD); } // Return -1 if ((1/b)%MOD) not exist (b and MOD not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
 void OPEN(string s) {
@@ -70,23 +63,32 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve();
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
+    ll n, sX, sY, eX, eY;
+    string s;
+    cin >> n >> sX >> sY >> eX >> eY >> s;
+    f(i,0,s.length()) {
+        ll dx, dy;
+        if (s[i] == 'E') {dx = 1; dy = 0;}
+        if (s[i] == 'S') {dx = 0; dy = -1;}
+        if (s[i] == 'W') {dx = -1; dy = 0;}
+        if (s[i] == 'N') {dx = 0; dy = 1;}
+        ll newX, newY;
+        newX = dx + sX;
+        newY = dy + sY;
+        if (abs(eX - newX) + abs(eY - newY) < abs(eX - sX) + abs(eY - sY)) {
+            sX = newX;
+            sY = newY;
+        }
+        if (sX == eX && sY == eY) {cout << i + 1 << "\n"; return 0;}
     }
-}
 
-void solve() {
-
+    cout << -1 << "\n";
 }
 
 /* Main() Ends Here */

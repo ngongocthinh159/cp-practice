@@ -63,8 +63,9 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solveUsingDP();
 void solveUsingMedianFact();
+void solveUsingDP();
+void solveUsingDP2();
 
 /* Main()  function */
 int main() {
@@ -84,6 +85,7 @@ int main() {
     */
     solveUsingMedianFact();
     // solveUsingDP();
+    // solveDP2();
 }
 
 void solveUsingMedianFact() {
@@ -132,6 +134,38 @@ void solveUsingDP() {
         if (min > cur) {min = cur;}
     }
     cout << (int) min/d << "\n";
+}
+
+void solveUsingDP2() {
+    ll n, m, d, sum = 0, min = INFF;
+    cin >> n >> m >> d;
+    ll nums[n*m];
+    ll l[n*m];
+    ll r[n*m];
+    l[0] = 0;
+    r[n*m - 1] = 0;
+    f(i,0,n*m) {
+        cin >> nums[i];
+        sum += nums[i];
+    }
+    sort(nums, nums + n*m);
+    f(i,1,n*m) {
+        if ((nums[i] - nums[i - 1]) % d != 0) {
+            cout << -1 << "\n";
+            return;
+        }
+        l[i] = l[i - 1] + i*(nums[i] - nums[i - 1])/d;
+    }
+    rf(i,n*m-2,0) {
+        r[i] = r[i + 1] + (n*m - i - 1)*(nums[i + 1] - nums[i])/d;
+    }
+    f(i,0,n*m) {
+        ll tmp;
+        if (nums[i]*n*m >= sum) tmp = (nums[i]*n*m - sum)/d + 2*r[i]; // Number of operations needed to all number reach to nums[i]
+        else if (nums[i]*n*m < sum) tmp = (sum - nums[i]*n*m)/d + 2*l[i];  // Number of operations needed to all number reach to nums[i]
+        if (min > tmp) min = tmp;  // Number of operations still smaller than min => update min
+    }
+    cout << min << "\n";
 }
 
 /* Main() Ends Here */
