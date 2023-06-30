@@ -14,9 +14,9 @@ using namespace std;
 #define sc set<char>
 
 /* FUNCTIONS */
-#define f(i,s,e) for(long long int i=(s);i<(e);i++)
-#define cf(i,s,e) for(long long int i=(s);i<=(e);i++)
-#define rf(i,e,s) for(long long int i=(e);i>=(s);i--)
+#define f(i,s,e) for(long long int i=s;i<e;i++)
+#define cf(i,s,e) for(long long int i=s;i<=e;i++)
+#define rf(i,e,s) for(long long int i=e;i>=s;i--)
 #define fe(a, b) for (auto&(a) : (b))
 #define fi first
 #define se second
@@ -77,16 +77,22 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll n;
+    cin >> n;
+    ll cnt1 = 0, cnt2 = 0;
+    f(i,0,n) {
+        ll tmp;
+        cin >> tmp;
+        if (tmp == 100) cnt1++;
+        else cnt2++;
+    }    
+    ll remain = cnt2%2;
+    if (!(cnt1 >= 2*remain) || ((cnt1 - 2*remain) % 2 != 0)) {cout << "NO\n"; return;}
+    cout << "YES\n";
 }
 
 /* Main() Ends Here */

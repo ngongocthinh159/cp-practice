@@ -71,22 +71,36 @@ typedef unsigned long long int  uint64;
 
 /* clang-format on */
 void solve();
+bool* SieveOfEratosthenes() {
+    const ll N = 1e7; // Check prime from 2 -> N
+    static bool prime[N + 1];
+    memset(prime, true, sizeof(prime));
+    for (ll i = 2; i * i <= N; i++) {
+        if (!prime[i]) continue;
+
+        for (ll j = i*i; j <= N; j+=i) {
+            prime[j] = false;
+        }
+    }
+    return prime;
+}
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll n, cnt = 0;
+    cin >> n;
+    bool* prime = SieveOfEratosthenes();
+    for (ll i = 2; cnt < n; i++) {
+        if (prime[i]) {cout << i << " "; cnt++;}
+    }
+    cout << "\n";
 }
 
 /* Main() Ends Here */

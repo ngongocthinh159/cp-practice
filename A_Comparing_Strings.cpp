@@ -14,9 +14,9 @@ using namespace std;
 #define sc set<char>
 
 /* FUNCTIONS */
-#define f(i,s,e) for(long long int i=(s);i<(e);i++)
-#define cf(i,s,e) for(long long int i=(s);i<=(e);i++)
-#define rf(i,e,s) for(long long int i=(e);i>=(s);i--)
+#define f(i,s,e) for(long long int i=s;i<e;i++)
+#define cf(i,s,e) for(long long int i=s;i<=e;i++)
+#define rf(i,e,s) for(long long int i=e;i>=s;i--)
 #define fe(a, b) for (auto&(a) : (b))
 #define fi first
 #define se second
@@ -77,16 +77,23 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    string s1, s2;
+    cin >> s1 >> s2;
+    ll f = -1, s = -1;
+    if (s1.length() != s2.length()) {cout << "NO\n"; return;}
+    f(i,0,s1.length()) {
+        if (s1[i] != s2[i]) {
+            if (f == -1) f = i;
+            else if (s == -1) s = i;
+            else {cout << "NO\n"; return;}
+        }
+    }
+    if (s1[s] == s2[f] && s1[f] == s2[s]) {cout << "YES\n"; return;}
+    else {cout << "NO\n"; return;} 
 }
 
 /* Main() Ends Here */

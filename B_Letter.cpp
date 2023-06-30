@@ -14,9 +14,9 @@ using namespace std;
 #define sc set<char>
 
 /* FUNCTIONS */
-#define f(i,s,e) for(long long int i=(s);i<(e);i++)
-#define cf(i,s,e) for(long long int i=(s);i<=(e);i++)
-#define rf(i,e,s) for(long long int i=(e);i>=(s);i--)
+#define f(i,s,e) for(long long int i=s;i<e;i++)
+#define cf(i,s,e) for(long long int i=s;i<=e;i++)
+#define rf(i,e,s) for(long long int i=e;i>=s;i--)
 #define fe(a, b) for (auto&(a) : (b))
 #define fi first
 #define se second
@@ -77,16 +77,32 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
+ll cnt[26*2] = {0};
 void solve() {
-
+    string s1, s2;
+    getline(cin, s1);
+    getline(cin, s2);
+    f(i,0,s1.length()) {
+        char c = s1[i];
+        if ('A' <= c && c <= 'Z') cnt[c - 'A']++;
+        if ('a' <= c && c <= 'z') cnt[c - 'a' + 26]++;
+    }
+    f(i,0,s2.length()) {
+        char c = s2[i];
+        if ('A' <= c && c <= 'Z') {
+            if (cnt[c - 'A'] > 0) cnt[c - 'A']--;
+            else {cout << "NO\n"; return;}
+        } 
+        
+        if ('a' <= c && c <= 'z') {
+            if (cnt[c - 'a' + 26] > 0) cnt[c - 'a' + 26]--;
+            else {cout << "NO\n"; return;}
+        } 
+    }
+    cout << "YES\n";
 }
 
 /* Main() Ends Here */

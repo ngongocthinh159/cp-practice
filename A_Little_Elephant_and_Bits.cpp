@@ -77,16 +77,23 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    string s;
+    cin >> s;
+    vector<char> vec;
+    bool isFirst = true;
+    f(i,0,s.length()) {
+        if (isFirst && s[i] == '0') {isFirst=false; continue;}
+        vec.pb(s[i]);
+    }
+    if (isFirst) vec.pop_back();
+    f(i,0,vec.size()) {
+        cout << vec[i];
+    }
+    cout << "\n";
 }
 
 /* Main() Ends Here */

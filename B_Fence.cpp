@@ -77,16 +77,24 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll n, k, sum = 0, min, ans = 1;
+    cin >> n >> k;
+    if (n <= k) {cout << 1 << "\n"; return;}
+    ll nums[n];
+    f(i,0,n) {
+        cin >> nums[i];
+        if (i < k) sum += nums[i];
+    }
+    min = sum;
+    cf(i,1,n-k) {
+        sum = sum - nums[i - 1] + nums[i + k - 1];
+        if (min > sum) {min = sum; ans = i + 1;}
+    }
+    cout << ans << "\n";
 }
 
 /* Main() Ends Here */

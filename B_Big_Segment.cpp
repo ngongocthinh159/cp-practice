@@ -14,9 +14,9 @@ using namespace std;
 #define sc set<char>
 
 /* FUNCTIONS */
-#define f(i,s,e) for(long long int i=(s);i<(e);i++)
-#define cf(i,s,e) for(long long int i=(s);i<=(e);i++)
-#define rf(i,e,s) for(long long int i=(e);i>=(s);i--)
+#define f(i,s,e) for(long long int i=s;i<e;i++)
+#define cf(i,s,e) for(long long int i=s;i<=e;i++)
+#define rf(i,e,s) for(long long int i=e;i>=s;i--)
 #define fe(a, b) for (auto&(a) : (b))
 #define fi first
 #define se second
@@ -77,16 +77,37 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
-void solve() {
+typedef struct {
+    ll x;
+    ll y;
+} Line;
 
+void solve() {
+    ll n, min = 1e9 + 1, max = -1, maxLength = -1;
+    cin >> n;
+    vector<pair<Line, int>> maxLine;
+    f(i,0,n) {
+        ll l, r;
+        cin >> l >> r;
+        if (min > l) min = l;
+        if (max < r) max = r;
+        if (maxLength < r - l + 1) {
+            maxLength = r - l + 1;
+            maxLine.clear();
+            maxLine.pb(mp(Line {l, r}, i + 1));
+        } else if (maxLength == r - l + 1) {
+            maxLine.pb(mp(Line {l, r}, i + 1));
+        }
+    }
+    f(i,0,maxLine.size()) {
+        Line line = maxLine[i].fi;
+        int pos = maxLine[i].se;
+        if (line.x <= min && max <= line.y) {cout << pos << "\n"; return;}
+    }
+    cout << -1 << "\n";
 }
 
 /* Main() Ends Here */

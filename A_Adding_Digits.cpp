@@ -77,16 +77,22 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll a, b, n;
+    cin >> a >> b >> n;
+    bool found = false;
+    a = a*10;
+    cf(i,0,9) {
+        if ((a+i) % b == 0) {a+=i; found = true; break;}
+    }
+    if (!found) {cout << -1 << "\n"; return;}
+    cout << a;
+    f(i,0,n-1)
+        cout << 0;
+    cout << "\n";
 }
 
 /* Main() Ends Here */

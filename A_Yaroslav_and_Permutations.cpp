@@ -77,16 +77,20 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll n, max = -1;
+    cin >> n;
+    ll cnt[1000+1] = {0};
+    f(i,0,n) {
+        ll tmp;
+        cin >> tmp;
+        cnt[tmp]++;
+        if (max < cnt[tmp]) max = cnt[tmp];
+    }
+    cout << ((n-max) >= (max-1) ? "YES\n" : "NO\n");
 }
 
 /* Main() Ends Here */
