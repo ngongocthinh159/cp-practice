@@ -76,28 +76,46 @@ void solve();
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
-
-    freopen("input.txt","r",stdin);
-    freopen("output.txt","w",stdout);
-
-    ll n, m;
-    cin >> n >> m;
-    ll i = 0, j = 0;
-    while (i < n || j < m) {
-        if (n > m) {
-            if (i < n) {cout << "B";}
-            if (j < m) {cout << "G";}
-        } else {
-            if (j < m) {cout << "G";}
-            if (i < n) {cout << "B";}
+    
+    solve();
+}
+ll dp[101][101] = {0};
+void fillDP() {
+    for (ll i = 2; i <= 100; i++) {
+        int cur = i;
+        while (cur%2 == 0) {
+            dp[i][2]++;
+            cur /= 2;
         }
-        i++; j++;
+
+        for (ll j = 3; j*j <= cur; j += 2) {
+            while (cur % j == 0) {
+                dp[i][j]++;
+                cur /= j;
+            }
+        }
+
+        if (cur > 2) dp[i][cur]++;
     }
-    cout << "\n";
 }
 
 void solve() {
-    
+    ll a, b, c, sum = 0;
+    cin >> a >> b >> c;
+    fillDP();
+    cf(i,1,a) {
+        cf(j,1,b) {
+            cf(k,1,c) {
+                ll tmp = 1;
+                cf(m,2,100) {
+                    tmp*=(dp[i][m] + dp[j][m] + dp[k][m] + 1); 
+                }
+                sum += tmp;
+            }
+        }
+    }
+
+    cout << sum << "\n";
 }
 
 /* Main() Ends Here */

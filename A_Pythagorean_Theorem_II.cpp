@@ -76,28 +76,20 @@ void solve();
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
-
-    freopen("input.txt","r",stdin);
-    freopen("output.txt","w",stdout);
-
-    ll n, m;
-    cin >> n >> m;
-    ll i = 0, j = 0;
-    while (i < n || j < m) {
-        if (n > m) {
-            if (i < n) {cout << "B";}
-            if (j < m) {cout << "G";}
-        } else {
-            if (j < m) {cout << "G";}
-            if (i < n) {cout << "B";}
-        }
-        i++; j++;
-    }
-    cout << "\n";
+    
+    solve();
 }
 
 void solve() {
-    
+    ll n, ans = 0;
+    cin >> n;
+    cf(i,1,n) {
+        for (ll j = i; j <= n; j++) {
+            ll tmp = i*i + j*j;
+            if (ceil((double) sqrt(tmp)) == floor((double) sqrt(tmp)) && 1 <= sqrt(tmp) && sqrt(tmp) <= n) {ans++; /* cout << i << " " << j << "\n"; */}
+        }
+    }
+    cout << ans << "\n";
 }
 
 /* Main() Ends Here */
