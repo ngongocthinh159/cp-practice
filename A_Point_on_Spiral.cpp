@@ -82,27 +82,68 @@ int main() {
 }
 
 void solve() {
-    ll n, ans, tmp;
-    cin >> n;
-    if (n <= 1) {cout << 1 << "\n"; return;}
-    if (n <= 2) {cout << 2 << "\n"; return;}
-    for (ll i = n; i >= 1; i--) {
-        // Always can get at least x*(x-1) lcm becuz x and x-1 is coprime
-        ll x = i;
-        ll y = x-1;
-        // Find the third coprime with x and x-1
-        for (ll z = y - 1; z >=1; z--) {
-            if (gcd(x,z) == 1 && gcd(y,z) == 1) {
-                tmp = lcm(lcm(x,y), z);
-                if (ans < tmp) {
-                    ans = tmp;
-                }
-                break;
-            }
-        }
+    // ll a, b, length = 1, turn = 0;
+    // bool increase = true;
+    // cin >> a >> b;
+    // ll x = 0, y = 0;
+    // if (x == a && y == b) {cout << turn << "\n"; return;}
+    // for (;;) {
+    //     if (increase) {
+    //         for (int i = 1; i <= length; i++) {
+    //             x+=1;
+    //             if (x == a && y == b) {cout << turn << "\n"; return;}
+    //         }
+    //         turn++;
+    //         for (int i = 1; i <= length; i++) {
+    //             y+=1;
+    //             if (x == a && y == b) {cout << turn << "\n"; return;}
+    //         }
+    //         turn++;
+    //     } else {
+    //         for (int i = 1; i <= length; i++) {
+    //             x-=1;
+    //             if (x == a && y == b) {cout << turn << "\n"; return;}
+    //         }
+    //         turn++;
+    //         for (int i = 1; i <= length; i++) {
+    //             y-=1;
+    //             if (x == a && y == b) {cout << turn << "\n"; return;}
+    //         }
+    //         turn++;
+    //     }
+
+    //     length++;
+    //     increase = !increase;
+    // }
+    ll x, y;
+    cin >> x >> y;
+    if ((x == 0 && y == 0) || (x == 1 && y == 0)) {cout << 0 << "\n"; return;}
+    int maxXY = max(abs(x), abs(y));
+    bool r = false, t = false, l = false, b = false, check = false;
+    if (x >= 0 && y >= 0) {
+        if (abs(x) >= abs(y)) r = true;
+        else t = true; 
+    } else if (x <= 0 && y >= 0) {
+        if (abs(x) <= abs(y)) t = true;
+        else l = true;
+    } else if (x <= 0 && y <= 0) {
+        if (abs(x) >= abs(y)) l = true;
+        else b = true;
+    } else if (x >= 0 && y <= 0) {
+        if (abs(x) == abs(y) + 1) {b = true; check = true;}
+        else if (abs(x) <= abs(y)) b = true;
+        else if (abs(x) > abs(y)) r = true;
     }
-    cout << ans << "\n";
+    if (check) {
+        maxXY--;
+    }
+    ll plus = -1;
+    if (r) plus = 1;
+    else if (t) plus = 2;
+    else if (l) plus = 3;
+    else if (b) plus = 4;
+    ll base = (maxXY - 1)*4;
+    cout << (base + plus) << "\n";
 }
 
 /* Main() Ends Here */
-

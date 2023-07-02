@@ -82,27 +82,23 @@ int main() {
 }
 
 void solve() {
-    ll n, ans, tmp;
+    ll n, sumX= 0, sumY = 0;
+    bool check = false;
     cin >> n;
-    if (n <= 1) {cout << 1 << "\n"; return;}
-    if (n <= 2) {cout << 2 << "\n"; return;}
-    for (ll i = n; i >= 1; i--) {
-        // Always can get at least x*(x-1) lcm becuz x and x-1 is coprime
-        ll x = i;
-        ll y = x-1;
-        // Find the third coprime with x and x-1
-        for (ll z = y - 1; z >=1; z--) {
-            if (gcd(x,z) == 1 && gcd(y,z) == 1) {
-                tmp = lcm(lcm(x,y), z);
-                if (ans < tmp) {
-                    ans = tmp;
-                }
-                break;
-            }
-        }
+    vector<int> x(n);
+    vector<int> y(n);
+    f(i,0,n) {
+        cin >> x[i];
+        cin >> y[i];
+        if ((x[i] + y[i]) & 1) check = true;
+        sumX+=x[i];
+        sumY+=y[i];
     }
-    cout << ans << "\n";
+    if (sumX%2==0&&sumY%2==0) {cout << 0 << "\n"; return;}
+    if ((sumX+sumY)&1) {cout << -1 << "\n"; return;}
+    if (!check) {cout << -1 << "\n"; return;}
+    if (n < 2) {cout << -1 << "\n"; return;}
+    cout << 1 << "\n"; return;
 }
 
 /* Main() Ends Here */
-

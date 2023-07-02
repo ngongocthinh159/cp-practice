@@ -81,28 +81,19 @@ int main() {
     solve();
 }
 
-void solve() {
-    ll n, ans, tmp;
+void solve() { 
+    ll n, tmp, l = -2e9, r = 2e9;
+    string s1,s2;
     cin >> n;
-    if (n <= 1) {cout << 1 << "\n"; return;}
-    if (n <= 2) {cout << 2 << "\n"; return;}
-    for (ll i = n; i >= 1; i--) {
-        // Always can get at least x*(x-1) lcm becuz x and x-1 is coprime
-        ll x = i;
-        ll y = x-1;
-        // Find the third coprime with x and x-1
-        for (ll z = y - 1; z >=1; z--) {
-            if (gcd(x,z) == 1 && gcd(y,z) == 1) {
-                tmp = lcm(lcm(x,y), z);
-                if (ans < tmp) {
-                    ans = tmp;
-                }
-                break;
-            }
-        }
+    f(i,0,n) {
+        cin >> s1 >> tmp >> s2;
+        if ((s1 == ">=" && s2 == "Y") || (s1 == "<" && s2 == "N")) l = max(l, tmp);
+        if ((s1 == ">" && s2 == "Y") || (s1 == "<=" && s2 == "N")) l = max(l, tmp+1);
+        if ((s1 == "<=" && s2 == "Y") || (s1 == ">" && s2 == "N")) r = min(r, tmp);
+        if ((s1 == "<" && s2 == "Y") || (s1 == ">=" && s2 == "N")) r = min(r, tmp-1);
     }
-    cout << ans << "\n";
+    if (l > r) {cout << "Impossible\n"; return;}
+    cout << l << "\n";
 }
 
 /* Main() Ends Here */
-

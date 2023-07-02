@@ -76,33 +76,30 @@ void solve();
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
-    cout.tie(0);
-    
+    freopen("input.txt", "r", stdin);
+	freopen("output.txt", "w", stdout);
     solve();
 }
 
+ll n, tmp;
+vector<vector<int>> cnt(5*1e3 + 1);
 void solve() {
-    ll n, ans, tmp;
     cin >> n;
-    if (n <= 1) {cout << 1 << "\n"; return;}
-    if (n <= 2) {cout << 2 << "\n"; return;}
-    for (ll i = n; i >= 1; i--) {
-        // Always can get at least x*(x-1) lcm becuz x and x-1 is coprime
-        ll x = i;
-        ll y = x-1;
-        // Find the third coprime with x and x-1
-        for (ll z = y - 1; z >=1; z--) {
-            if (gcd(x,z) == 1 && gcd(y,z) == 1) {
-                tmp = lcm(lcm(x,y), z);
-                if (ans < tmp) {
-                    ans = tmp;
-                }
-                break;
+    cf(i,1,2*n) {
+        cin >> tmp;
+        cnt[tmp].pb(i);
+    }
+    f(i,1,cnt.size()) {
+        if (cnt[i].size()%2 != 0) {cout << -1 << "\n"; return;}
+    }
+    f(i,1,cnt.size()) {
+        vector<int>& cur = cnt[i];
+        if (cur.size() > 0) {
+            for (ll i = 0; i < cur.size() - 1; i+=2) {
+                cout << cur[i] << " " << cur[i + 1] << "\n";
             }
         }
     }
-    cout << ans << "\n";
 }
 
 /* Main() Ends Here */
-
