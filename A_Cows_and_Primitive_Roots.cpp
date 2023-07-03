@@ -95,14 +95,13 @@ void solve() {
     memset(dp, -1, sizeof(dp));
     ll p, ans = 0;
     cin >> p;
-    cf(x,2,p) {
+    cf(x,1,p) {
         bool shouldIncrease = true;
         if ((pow_mod(x, p - 1, p) - 1)%p != 0) continue;
         cf(j,1,p-2) {
             if ((pow_mod(x, j, p) - 1)%p == 0) {shouldIncrease = false; break;}
         }
         if (shouldIncrease) ans++;
-        cout << "\n";
     }
     cout << ans << "\n";
 }
