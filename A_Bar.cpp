@@ -52,7 +52,6 @@ ll addMod(ll a, ll b) { return mod(mod(a) + mod(b)); }
 ll subMod(ll a, ll b) { return mod(mod(a) - mod(b)); }
 ll mulMod(ll a, ll b) { return mod(mod(a) * mod(b)); }
 ll powMod(ll x, ll n) { if (n == 0) return 1%MOD; ll u = powMod(mod(x),n/2); u = (u*u)%MOD; if (n%2 == 1) u = (u*(mod(x)))%MOD; return u; } // (x^n)%MOD
-ll powMod(ll x, ll n, ll mod) { if (n == 0) return 1%mod; ll tmp = powMod(x,n/2,mod); if (n%2==0) return (tmp*tmp)%mod; else return (((tmp*tmp)%mod)*(x%mod))%mod; } // Custom mod number
 ll inverseMod(ll a) { if (gcd(a, MOD) != 1) return -1; return powMod(mod(a), MOD-2); } // Return -1 if ((1/a)%MOD) not exist (a and MOD not coprime)
 ll divMod(ll a, ll b) { ll tmp = inverseMod(b); if (tmp == -1) return -1; return (((mod(a))*inverseMod(mod(b)))%MOD); } // Return -1 if ((1/b)%MOD) not exist (b and MOD not coprime)
 void yes() { cout<<"YES\n"; }
@@ -79,16 +78,42 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
+    solve();
+}
 
-    while (cases--) {
-        solve();
-    }
+vector<string> alcohols = {"ABSINTH", "BEER", "BRANDY", "CHAMPAGNE", "GIN", "RUM", "SAKE", "TEQUILA", "VODKA", "WHISKEY", "WINE"};
+
+inline bool isInteger(const std::string & s) {
+   if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+
+   char * p;
+   strtol(s.c_str(), &p, 10);
+
+   return (*p == 0);
 }
 
 void solve() {
-
+    ll n, ans = 0;
+    cin >> n;
+    set<string> set;
+    f(i,0,alcohols.size()) {
+        set.insert(alcohols[i]);
+    }
+    f(i,0,n) {
+        string tmp;
+        cin >> tmp;
+        char* p;
+        long converted = strtol(tmp.c_str(), &p, 10);
+        if (*p) {
+            // conversion failed because the input wasn't a number
+            if (set.find(tmp) != set.end()) ans++;
+        }
+        else {
+            // use converted
+            if (converted < 18) ans++;
+        }
+    }
+    cout << ans << "\n";
 }
 
 /* Main() Ends Here */
