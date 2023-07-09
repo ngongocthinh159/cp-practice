@@ -57,9 +57,11 @@ ll inverseMod(ll a) { if (gcd(a, MOD) != 1) return -1; return powMod(mod(a), MOD
 ll divMod(ll a, ll b) { ll tmp = inverseMod(b); if (tmp == -1) return -1; return (((mod(a))*inverseMod(mod(b)))%MOD); } // Return -1 if ((1/b)%MOD) not exist (b and MOD not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
-void OPEN() {
-    freopen("input.txt", "r", stdin);
-	freopen("output.txt", "w", stdout);
+void OPEN(string s) {
+#ifndef TESTING
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+#endif
 }
 
 /*  All Required define Pre-Processors and typedef Constants */
@@ -77,16 +79,31 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    ll n, l, r;
+    cin >> n;
+    bool dp[100];
+    memset(dp, false, sizeof(dp));
+    f(i,0,n) {
+        cin >> l >> r;
+        if (i == 0) {
+            f(j,l,r) {
+                dp[j] = true;
+            }
+            continue;
+        }
+        f(j,l,r) {
+            dp[j] = false;
+        }
+    }
+    ll cnt = 0;
+    f(i,0,100) {
+        if (dp[i]) cnt++;
+    }
+    cout << cnt << "\n";
 }
 
 /* Main() Ends Here */

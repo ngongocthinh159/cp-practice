@@ -77,16 +77,14 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    int a, b, r;
+    cin >> a >> b >> r;
+    if (2*r > min(a,b)) cout << "Second\n";
+    else cout << "First\n";
 }
 
 /* Main() Ends Here */

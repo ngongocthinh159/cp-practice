@@ -77,16 +77,29 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-
+    string s;
+    cin >> s;
+    ll ans = LLONG_MAX;
+    int cnt[26];
+    memset(cnt, 0, sizeof(cnt));
+    f(i,0,s.length()) {
+        if (s[i]=='n'||s[i]=='i'||s[i]=='e'||s[i]=='t') {
+            cnt[s[i]-'a']++;
+        }
+    }
+    f(i,0,26) {
+        if (i + 'a' == 'n') ans = min(ans, cnt[i]/2);
+        if (i + 'a' == 'i') ans = min(ans, cnt[i]);
+        if (i + 'a' == 'e') ans = min(ans, cnt[i]/3);
+        if (i + 'a' == 't') ans = min(ans, cnt[i]);
+    }
+    if (ans == 0) {cout << 0 << "\n"; return;}
+    if (2*ans+1 <= cnt['n'-'a']) cout << ans << "\n";
+    else cout << ans-1 << "\n";
 }
 
 /* Main() Ends Here */

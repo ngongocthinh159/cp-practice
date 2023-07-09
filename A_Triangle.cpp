@@ -77,16 +77,38 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
+    solve();
+}
 
-    while (cases--) {
-        solve();
-    }
+typedef struct {
+    int x, y;
+} Point;
+
+bool isRight(int x1, int y1, int x2, int y2, int x3, int y3) {
+    if (((x1-x2) == 0 && (y1-y2)==0) || ((x1-x3) == 0 && (y1-y3)==0) || ((x3-x2) == 0 && (y3-y2)==0)) return false;
+    if ((x1-x2)*(x2-x3)+(y1-y2)*(y2-y3) == 0) return true;
+    if ((x1-x2)*(x1-x3)+(y1-y2)*(y1-y3) == 0) return true;
+    if ((x1-x3)*(x2-x3)+(y1-y3)*(y2-y3) == 0) return true;
+    return false;
 }
 
 void solve() {
-
+    int x1, y1, x2, y2, x3, y3;
+    cin >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
+    if (isRight(x1, y1, x2, y2, x3, y3)) {cout << "RIGHT\n"; return;}
+    if (isRight(x1-1, y1, x2, y2, x3, y3) ||
+        isRight(x1+1, y1, x2, y2, x3, y3) ||
+        isRight(x1, y1-1, x2, y2, x3, y3) ||
+        isRight(x1, y1+1, x2, y2, x3, y3) ||
+        isRight(x1, y1, x2-1, y2, x3, y3) ||
+        isRight(x1, y1, x2+1, y2, x3, y3) ||
+        isRight(x1, y1, x2, y2-1, x3, y3) ||
+        isRight(x1, y1, x2, y2+1, x3, y3) ||
+        isRight(x1, y1, x2, y2, x3-1, y3) ||
+        isRight(x1, y1, x2, y2, x3+1, y3) ||
+        isRight(x1, y1, x2, y2, x3, y3-1) ||
+        isRight(x1, y1, x2, y2, x3, y3+1)) {cout << "ALMOST\n"; return;}
+    cout << "NEITHER\n";
 }
 
 /* Main() Ends Here */

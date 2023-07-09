@@ -77,16 +77,39 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
+    solve();
+}
 
-    while (cases--) {
-        solve();
+bool hasZero(int num) {
+    if (num == 0) return true;
+    while (num > 0) {
+        int digit = num%10;
+        if (digit == 0) return true;
+        num /= 10;
     }
+    return false;
 }
 
 void solve() {
-
+    ll n, tmp;
+    cin >> n;
+    bool lessThan10 = false, twoDigitsTen = false, twoDigits = false;
+    int num1 = -1, num2 = -1, num3= -1;
+    vector<int> ans;
+    f(j,0,n) {
+        cin >> tmp;
+        if (tmp == 0 || tmp == 100) ans.pb(tmp);
+        else if (1 <= 1 && tmp <= 9) {num1 = tmp; lessThan10 = true;}
+        else if (tmp >= 10 && tmp%10 == 0) {num2 = tmp; twoDigitsTen = true;}
+        else if (tmp >= 10) {num3 = tmp; twoDigits = true;}
+    }
+    if (lessThan10 && twoDigitsTen) {ans.pb(num1); ans.pb(num2);}
+    else if (lessThan10) {ans.pb(num1);}
+    else if (twoDigitsTen) {ans.pb(num2);}
+    else if (twoDigits) {ans.pb(num3);}
+    cout << ans.size() << "\n";
+    f(i,0,ans.size())
+        cout << ans[i] << " ";
 }
 
 /* Main() Ends Here */
