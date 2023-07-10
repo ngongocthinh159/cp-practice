@@ -69,24 +69,25 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve();
+// vector<bool> dp(2e9, false);
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
+    ll n;
+    cin >> n;
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
+    f(i,1,sqrt(2*n)) {
+        int tmp = 2*n - i*(i+1);
+        if (tmp > 0) {
+            int tmp2 = sqrt(tmp);
+            if (tmp2*(tmp2+1) == tmp) {cout << "YES\n"; return 0;}
+        }
     }
+    cout << "NO\n";
 }
 
-void solve() {
-    
-}
 
 /* Main() Ends Here */

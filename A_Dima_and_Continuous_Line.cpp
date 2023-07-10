@@ -77,16 +77,32 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
-
+bool visited[(int)(2e6 + 1)];
 void solve() {
-    
+    memset(visited, false, sizeof(visited));
+    ll n, cur;
+    cin >> n;
+    vector<pair<int,int>> segs;
+    ll prev = -1;
+    f(i,0,n) {
+        cin >> cur;
+        if (i != 0) {
+            int x1 = min(prev,cur);
+            int x2 = max(prev,cur);
+            if (segs.size() > 1) {
+                f(j,0,segs.size()) {
+                    int x11 = segs[j].fi;
+                    int x22 = segs[j].se;
+                    if ((x1 < x11 && x11 < x2 && x2 < x22) || (x1 > x11 && x22 > x1 && x2 > x22)) {cout<<"yes\n";return;}
+                }
+            }
+            segs.pb({x1, x2});
+        }
+        prev = cur;
+    }
+    cout << "no\n";
 }
 
 /* Main() Ends Here */
