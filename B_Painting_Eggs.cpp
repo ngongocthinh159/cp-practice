@@ -76,16 +76,21 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 void solve() {
-    
+    int n, tmp1, tmp2;
+    cin >> n;
+    ll sum1 = 0, sum2 = 0;
+    string ans = "";
+    f(i,0,n) {
+        cin >> tmp1 >> tmp2;
+        if (sum1 + tmp1 <= sum2 + 500) {sum1 += tmp1; ans += 'A';}
+        else {sum2 += tmp2; ans += 'G';}
+    }
+    if (abs(sum1-sum2) <= 500) cout << ans << "\n";
+    else cout << -1 << "\n";
 }
 
 /* Main() Ends Here */
