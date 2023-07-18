@@ -1,39 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-/*
-    MAZE problem:
-    Lin is trapped in a maze. The mazie is one-dimensional array of length N,
-    and each position has a magical number a(i) on it. Lin is currently at v position.
-    She needs to escape through the exit at the u position. At any j position
-    (1 <= j <= N), she can do one of the following three actions:
-        1. Move left to j - 1 using L energy, if j > 1.
-        2. Move right to j + 1 using R energy, if j < N.
-        3. Jump to a position with the same magical number as 
-        the one on the a(j). This action require K energy.
-    Help Lin escape the maze with minimum energy.
-
-    Input:
-    The first line consists of 4 integers,
-    N, L, R, K (1 <= N <= 10^5, 1 <= L, R, K <= 10^9)
-    The second line consists of 2 integers,
-    v, u (1 <= v, u <= N)
-    The third line consists of N integers,
-    a1,a2,...,aN (1 <= a(i) <= 10^9) the magic numbers.
-
-    Output:
-    One integer denotes the minimum energy needed to escape the maze.
-
-    Sample test case:
-    Input:
-    6 2 3 1
-    1 5
-    2 1 3 4 5 1
-
-    Expected output:
-    6
-*/
-
 /* clang-format off */
 
 /* TYPES  */
@@ -102,69 +69,54 @@ typedef unsigned long long int  uint64;
 
 /* clang-format on */
 void solve();
-ll dfs(vector<int>& nums, vector<ll>& dp, vector<bool>& visited, int index, int targetIndex, int curEnergy, unordered_map<int,vector<int>>& map);
+ll count(ll l);
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
-
-    OPEN();
     
     solve();
 }
 
-int n, l, r, k, u, v;
+#define MX 1000005
+int n, k;
+int nums[MX];
+int firstLargerOrEqualLeft[MX];
+int firstLargerRight[MX];
+stack<int> st;
 
 void solve() {
-    cin >> n >> l >> r >> k >> v >> u;
-    vector<int> nums(n);
-    vector<bool> visited(n, false);
-    unordered_map<int,vector<int>> map;
-    vector<ll> dp(n, -1);
-    f(i,0,n) {
+    cin >> n >> k;
+    f(i,0,n) { // Find left (stop at first strictly greater than (accept equal))
         cin >> nums[i];
-        vector<int>& vec = map[nums[i]];
-        vec.pb(i);
+
+        while (st.size() > 0 && nums[i] > nums[st.top()]) st.pop();
+        if (st.size() > 0) firstLargerOrEqualLeft[i] = st.top();
+        else firstLargerOrEqualLeft[i] = -1;
+        st.push(i);
     }
-    dfs(nums,dp,visited,v-1,u-1,0,map);
-    cout << dp[v-1] << "\n";
+    while (st.size() > 0) st.pop();
+    f(i,0,n) { // Find right (stop at first greater than or equal (not accept equal))
+        while (st.size() > 0 && nums[i] > nums[st.top()]) {firstLargerRight[st.top()] = i; st.pop();}
+        st.push(i);
+    }
+    while (st.size() > 0) {firstLargerRight[st.top()] = n; st.pop();}
+    int ans = 0;
+    f(i,0,n) {
+        ll tmp = count(firstLargerRight[i] - firstLargerOrEqualLeft[i] - 1) 
+        - count(i-firstLargerOrEqualLeft[i]-1) - count(firstLargerRight[i]-i-1);
+        ans = ((ans%MOD) + ((tmp%MOD)*(nums[i]%MOD)%MOD))%MOD;
+    }
+    cout << ans << "\n";
 }
 
-ll dfs(vector<int>& nums, vector<ll>& dp, vector<bool>& visited, int index, int targetIndex, int curEnergy, unordered_map<int,vector<int>>& map) {
-    if (index == targetIndex) return dp[index] = curEnergy;
-    if (dp[index] != -1) return dp[index];
-
-    ll tmp = LLONG_MAX;
-    if (index >= 1) {
-        if (!visited[index-1]) {
-            visited[index-1] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, index-1, targetIndex, curEnergy + l,map));
-            visited[index-1] = false;
-        }
-    }
-    
-    if (index <= nums.size() - 2) {
-        if (!visited[index+1]) {
-            visited[index+1] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, index+1, targetIndex, curEnergy + r,map));
-            visited[index+1] = false;
-        }
-    }
-
-    vector<int>& v = map[nums[index]];
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i] == index) continue;
-        if (!visited[v[i]]) {
-            visited[v[i]] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, v[i], targetIndex, curEnergy + k,map));
-            visited[v[i]] = false;
-        }
-    }
-
-    return dp[index] = tmp;
+ll count(ll l) {
+    if (l >= k) {
+        ll a = (l-k)/(k-1);
+        return (a+1)*(l-k+1)-(k-1)*(a+1)*a/2;
+    } else return 0;
 }
-
 
 /* Main() Ends Here */

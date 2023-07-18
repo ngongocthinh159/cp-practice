@@ -1,39 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-/*
-    MAZE problem:
-    Lin is trapped in a maze. The mazie is one-dimensional array of length N,
-    and each position has a magical number a(i) on it. Lin is currently at v position.
-    She needs to escape through the exit at the u position. At any j position
-    (1 <= j <= N), she can do one of the following three actions:
-        1. Move left to j - 1 using L energy, if j > 1.
-        2. Move right to j + 1 using R energy, if j < N.
-        3. Jump to a position with the same magical number as 
-        the one on the a(j). This action require K energy.
-    Help Lin escape the maze with minimum energy.
-
-    Input:
-    The first line consists of 4 integers,
-    N, L, R, K (1 <= N <= 10^5, 1 <= L, R, K <= 10^9)
-    The second line consists of 2 integers,
-    v, u (1 <= v, u <= N)
-    The third line consists of N integers,
-    a1,a2,...,aN (1 <= a(i) <= 10^9) the magic numbers.
-
-    Output:
-    One integer denotes the minimum energy needed to escape the maze.
-
-    Sample test case:
-    Input:
-    6 2 3 1
-    1 5
-    2 1 3 4 5 1
-
-    Expected output:
-    6
-*/
-
 /* clang-format off */
 
 /* TYPES  */
@@ -102,69 +69,39 @@ typedef unsigned long long int  uint64;
 
 /* clang-format on */
 void solve();
-ll dfs(vector<int>& nums, vector<ll>& dp, vector<bool>& visited, int index, int targetIndex, int curEnergy, unordered_map<int,vector<int>>& map);
 
 /* Main()  function */
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
-
-    OPEN();
     
     solve();
 }
 
-int n, l, r, k, u, v;
-
 void solve() {
-    cin >> n >> l >> r >> k >> v >> u;
-    vector<int> nums(n);
-    vector<bool> visited(n, false);
-    unordered_map<int,vector<int>> map;
-    vector<ll> dp(n, -1);
-    f(i,0,n) {
-        cin >> nums[i];
-        vector<int>& vec = map[nums[i]];
-        vec.pb(i);
+    ll n, m;
+    cin >> n >> m;
+    vector<int> v(n + 1, -1);
+    int nums[3];
+    bool check[4];
+    f(i,0,m) {
+        cin >> nums[0] >> nums[1] >> nums[2];
+        memset(check,false,sizeof(check));
+        f(j,0,3) {
+            if (v[nums[j]] != -1) check[v[nums[j]]] = true;
+        }
+        f(j,0,3) {
+            if (v[nums[j]] == -1) {
+                cf(k,1,3) {
+                    if (!check[k]) {v[nums[j]] = k; check[k] = true; break;}
+                }
+            }
+        }
     }
-    dfs(nums,dp,visited,v-1,u-1,0,map);
-    cout << dp[v-1] << "\n";
+    cf(i,1,n) {
+        cout << v[i] << " ";
+    }
 }
-
-ll dfs(vector<int>& nums, vector<ll>& dp, vector<bool>& visited, int index, int targetIndex, int curEnergy, unordered_map<int,vector<int>>& map) {
-    if (index == targetIndex) return dp[index] = curEnergy;
-    if (dp[index] != -1) return dp[index];
-
-    ll tmp = LLONG_MAX;
-    if (index >= 1) {
-        if (!visited[index-1]) {
-            visited[index-1] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, index-1, targetIndex, curEnergy + l,map));
-            visited[index-1] = false;
-        }
-    }
-    
-    if (index <= nums.size() - 2) {
-        if (!visited[index+1]) {
-            visited[index+1] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, index+1, targetIndex, curEnergy + r,map));
-            visited[index+1] = false;
-        }
-    }
-
-    vector<int>& v = map[nums[index]];
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i] == index) continue;
-        if (!visited[v[i]]) {
-            visited[v[i]] = true;
-            tmp = min(tmp,dfs(nums, dp, visited, v[i], targetIndex, curEnergy + k,map));
-            visited[v[i]] = false;
-        }
-    }
-
-    return dp[index] = tmp;
-}
-
 
 /* Main() Ends Here */
