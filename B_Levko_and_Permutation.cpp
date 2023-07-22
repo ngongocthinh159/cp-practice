@@ -78,57 +78,17 @@ int main() {
     
     solve();
 }
-#define N 1000005
-int n, w, l;
-int nums[N];
-ll res[N], plusInRange[N];
-deque<int> dq;
 
 void solve() {
-    cin >> n >> w;
-    f(k,0,n) {
-        cin >> l;
-        int mx = INT_MIN;
-        
-        int windowSize = w - l + 1;
-        f(i,0,l) {
-            cin >> nums[i];
-            if (mx < nums[i]) mx = nums[i];
-            while (dq.size() && nums[i] >= nums[dq.front()]) dq.pop_front();
-            dq.push_front(i);
-            while (dq.size() && !(i - windowSize + 1 <= dq.back() && dq.back() <= i)) dq.pop_back();
-            if (i + l <= w - 1 || i - l >= 0) res[i] += max(0,nums[dq.back()]);
-            else res[i] += nums[dq.back()];
-        }
-        dq.clear();
-        int offset = w-1-(l-1);
-        rf(i,w-1,max(l,w-l)) {
-            int j = i - offset;
-            while (dq.size() && nums[j] >= nums[dq.front()]) dq.pop_front();
-            dq.push_front(j);
-            while (dq.size() && !(j <= dq.back() && dq.back() <= j + windowSize - 1)) dq.pop_back();
-            if (i + l <= w - 1 || i - l >= 0) res[i] += max(0,nums[dq.back()]);
-            else res[i] += nums[dq.back()];
-        }
-        dq.clear();
-        if (2*l + 1 <= w) {
-            plusInRange[l] += max(0,mx);
-            plusInRange[w-l-1] = plusInRange[l];
-        }
-    }
-    bool isFirst = true;
-    int tmp = (w-1)/2;
-    cf(i,0,tmp) {
-        if (!isFirst) { plusInRange[i] += plusInRange[i - 1]; } 
-        else if (plusInRange[i] != 0) { isFirst = false; }
-    }
-    isFirst = true;
-    rf(i,w-1,tmp+1) {
-        if (!isFirst) { plusInRange[i] += plusInRange[i + 1]; } 
-        else if (plusInRange[i] != 0) { isFirst = false; }
-    }
-    f(i,0,w)
-        cout << res[i] + plusInRange[i] << " ";
+    int n, k;
+    cin >> n >> k;
+    int equal1 = n-k;
+    if (equal1 <= 0) {cout << "-1\n"; return;}
+    cf(i,1,equal1)
+        if (i != equal1) cout << i + 1 << " ";
+        else cout << 1 << " ";
+    cf(i,equal1+1,n)
+        cout << i << " ";
 }
 
 /* Main() Ends Here */

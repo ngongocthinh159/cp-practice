@@ -77,58 +77,33 @@ int main() {
     cout.tie(0);
     
     solve();
+    ll cases;
 }
-#define N 1000005
-int n, w, l;
-int nums[N];
-ll res[N], plusInRange[N];
-deque<int> dq;
 
 void solve() {
-    cin >> n >> w;
-    f(k,0,n) {
-        cin >> l;
-        int mx = INT_MIN;
-        
-        int windowSize = w - l + 1;
-        f(i,0,l) {
-            cin >> nums[i];
-            if (mx < nums[i]) mx = nums[i];
-            while (dq.size() && nums[i] >= nums[dq.front()]) dq.pop_front();
-            dq.push_front(i);
-            while (dq.size() && !(i - windowSize + 1 <= dq.back() && dq.back() <= i)) dq.pop_back();
-            if (i + l <= w - 1 || i - l >= 0) res[i] += max(0,nums[dq.back()]);
-            else res[i] += nums[dq.back()];
-        }
-        dq.clear();
-        int offset = w-1-(l-1);
-        rf(i,w-1,max(l,w-l)) {
-            int j = i - offset;
-            while (dq.size() && nums[j] >= nums[dq.front()]) dq.pop_front();
-            dq.push_front(j);
-            while (dq.size() && !(j <= dq.back() && dq.back() <= j + windowSize - 1)) dq.pop_back();
-            if (i + l <= w - 1 || i - l >= 0) res[i] += max(0,nums[dq.back()]);
-            else res[i] += nums[dq.back()];
-        }
-        dq.clear();
-        if (2*l + 1 <= w) {
-            plusInRange[l] += max(0,mx);
-            plusInRange[w-l-1] = plusInRange[l];
+    int v;
+    cin >> v;
+    int points[10+1];
+    int minP = INT_MAX;
+    int maxNminP = -1;
+    cf(i,1,9) {
+        cin >> points[i];
+        if (minP > points[i]) {minP = points[i]; maxNminP = i;}
+        else if (minP == points[i]) maxNminP = i;
+    }
+    int numberOfDigits = v / minP;
+    int tmp = numberOfDigits;
+    if (numberOfDigits == 0) {cout << "-1\n"; return;}
+    cf(i,1,tmp) {
+        rf(j,9,1) {
+            if (v - points[j] >= 0 && ((v - points[j]) / minP >= (numberOfDigits - 1))) {
+                cout << j;
+                numberOfDigits--;
+                v-=points[j];
+                break;
+            }
         }
     }
-    bool isFirst = true;
-    int tmp = (w-1)/2;
-    cf(i,0,tmp) {
-        if (!isFirst) { plusInRange[i] += plusInRange[i - 1]; } 
-        else if (plusInRange[i] != 0) { isFirst = false; }
-    }
-    isFirst = true;
-    rf(i,w-1,tmp+1) {
-        if (!isFirst) { plusInRange[i] += plusInRange[i + 1]; } 
-        else if (plusInRange[i] != 0) { isFirst = false; }
-    }
-    f(i,0,w)
-        cout << res[i] + plusInRange[i] << " ";
 }
 
 /* Main() Ends Here */
