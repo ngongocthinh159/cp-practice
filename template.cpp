@@ -1,3 +1,7 @@
+/*
+    Solution for: 
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -68,7 +72,9 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve();
+void solve() {
+
+}
 
 /* Main()  function */
 int main() {
@@ -82,10 +88,6 @@ int main() {
     while (cases--) {
         solve();
     }
-}
-
-void solve() {
-    
 }
 
 /* Main() Ends Here */
