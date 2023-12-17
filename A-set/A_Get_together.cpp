@@ -1,19 +1,4 @@
 /*
-    Solution for: https://www.codechef.com/problems/RRATING
-*/
-
-#include <bits/stdc++.h>
-using namespace std;
-
-#define ll long long
-
-int n;
-void solve() {
-	cin >> n;
-  priority_queue<int> rest2_3;
-  priority_queue<int, vector<int>, greater<>> top1_3;
-  int items = 0;
-  for (int i = 0;/*
     Solution for: 
 */
 
@@ -87,8 +72,51 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int N = 1e5 +  5;
+int n;
+int x[N];
+int v[N];
+bool isIntersect(pair<double,double>& a, pair<double,double>& b) {
+    return !(a.second < b.first || a.first > b.second);
+}
+pair<double, double> getIntersect(pair<double,double>& a, pair<double,double>& b) {
+    pair<double,double> p;
+    if (a.first >= b.first) p.first = a.first;
+    else p.first = b.first;
+    if (a.second <= b.second) p.second = a.second;
+    else p.second = b.second;
+    return p;
+}
+bool check(double time) {
+    vector<pair<double,double>> r;
+    for (int i = 0; i < n; i++) {
+        r.push_back({(double) x[i] - time*v[i], (double) x[i] + time*v[i]});
+    }
+    auto curRange = r[0];
+    for (int i = 1; i < n; i++) {
+        if (!isIntersect(curRange, r[i])) return false;
+        curRange = getIntersect(r[i], curRange);
+    }
+    return true;
+}
 void solve() {
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> x[i] >> v[i];
+    }
+    double l = 0, r = 2*1e18 + 5;
+    double ans;
+    for (int i = 0; i < 100; i++) {
+        double m = l + (r - l)/2;
 
+        if (check(m)) {
+            ans = m;
+            r = m - 1;
+        } else {
+            l = m + 1;
+        }
+    }
+    printf("%.7f\n", ans);
 }
 
 /* Main()  function */
@@ -97,46 +125,7 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
-/* Main() Ends Here */ i < n; i++) {
-    int c; cin >> c;
-    if (c == 1) items++;
-    int cnt = items/3;
-    
-    if (c == 1) {
-      int val; cin >> val;
-      if (cnt == 0) {rest2_3.push(val); continue;}
-      
-      if ((int) top1_3.size() < cnt) {
-        rest2_3.push(val);
-        int tmp = rest2_3.top(); rest2_3.pop();
-        top1_3.push(tmp);
-      } else {
-        int tmp = top1_3.top();
-        if (tmp < val) {
-          top1_3.pop();
-          top1_3.push(val);
-          rest2_3.push(tmp);
-        } else rest2_3.push(val);
-      }
-    } else {
-      if (cnt <= 0) {cout << "No reviews yet\n";}
-      else cout << top1_3.top() << "\n";
-    }
-  }
-}
-
-int main() {
-  ios::sync_with_stdio(0);
-  cin.tie(0);
-  cout.tie(0);
-  solve();
-  return 0;
-}
+/* Main() Ends Here */
