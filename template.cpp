@@ -3,7 +3,12 @@
 */
 
 #include <bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
 using namespace std;
+using namespace chrono;
+using namespace __gnu_pbds;
 
 /* clang-format off */
 
@@ -33,12 +38,17 @@ template <class T>
 void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cout << "\b}"; }
 
 /* UTILS */
+#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
+
 #define MOD 1000000007
 #define PI 3.1415926535897932384626433832795
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-ll directions[8][2] = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From dir[4] Right of Up then clock wise
+vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
 ll min(int a,ll b) { if (a<b) return a; return b; }
@@ -78,9 +88,7 @@ void solve() {
 
 /* Main()  function */
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
+    fastio();
     
     ll cases;
     cin >> cases;
