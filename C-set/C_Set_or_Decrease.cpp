@@ -11,13 +11,19 @@ const int N = 2e5 + 5;
 ll n, k;
 ll a[N];
 ll pre[N];
-bool check(ll x) {
-    ll sum = INT_MAX;
-    for (int i = 1; i <= min(x, n - 1); i++) {
-        int mn = a[0] - (x - i);
-        sum = min(sum, )
+bool check(ll m) {
+    ll y = min(n - 1, m);
+    for (ll len = 0; len <= y; len++) {
+        ll curSum = pre[n - 1];
+        ll x = m - len;
+        curSum -= x;
+        if (len != 0) {
+            ll s = n - len; ll e = n - 1;
+            curSum -= (pre[e] - pre[s] + a[s] - 1LL*(e - s + 1)*(a[0] - x));
+        }
+        if (curSum <= k) return true;
     }
-    return sum <= k;
+    return false;
 }
 void solve() {
     cin >> n >> k;

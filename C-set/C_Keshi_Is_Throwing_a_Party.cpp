@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1610/C
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,39 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+struct P {
+    int a, b, money;
+    P (int _a, int _b, int _money): a(_a), b(_b), money(_money) {}
+};
+const int N = 2e5 + 5;
+int n;
+vector<P> v;
+bool check(int x) {
+    int cur = 1;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) {
+        if (x - v[i].a <= cur && cur <= v[i].b + 1) {cnt++; cur++;}
+    }
+    return cnt >= x;
+}
 void solve() {
-
+    v.clear();
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        int a, b; cin >> a >> b;
+        v.push_back(P(a, b, i));
+    }
+    int l = 0, r = n, ans = -1;
+    while (l <= r) {
+        int m = l + (r - l)/2;
+        if (check(m)) {
+            ans = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */

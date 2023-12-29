@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1223/C
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,44 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int N = 2e5 + 5;
+ll n;
+ll x, a, y, b;
+ll k;
+ll p[N];
+bool check(ll day) {
+    vector<ll> v;
+    for (int i = 1; i <= day; i++) {
+        ll cur = 0;
+        if (i >= a && i%a == 0) cur += x;
+        if (i >= b && i%b == 0) cur += y;
+        if (cur != 0) v.push_back(cur);
+    }
+    sort(v.begin(), v.end(), greater<>());
+    ll sum = 0;
+    for (int i = 0, j = n - 1; i < v.size(); i++, j--) {
+        sum += v[i]*p[j];
+    }
+    return sum >= 1LL*k*100;
+}
 void solve() {
-
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> p[i];
+    }
+    sort(p, p + n);
+    cin >> x >> a >> y >> b;
+    cin >> k;
+    ll l = 0, r = n, ans = -1;
+    while (l <= r) {
+        ll m = l + (r - l)/2;
+        if (check(m)) {
+            ans = m;
+            r = m - 1;
+        } else
+            l = m + 1;
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */

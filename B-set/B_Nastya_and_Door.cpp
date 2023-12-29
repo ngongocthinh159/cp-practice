@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/1341/problem/B
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,34 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int N = 2e5 + 5;
+int n, k;
+int a[N];
+int v[N];
+int psum[N];
 void solve() {
-
+    cin >> n >> k;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+    for (int i = 0; i < n; i++) {
+        if (i == 0 || i == n - 1) v[i] = 0;
+        else if (a[i - 1] < a[i] && a[i] > a[i + 1]) v[i] = 1;
+        else v[i] = 0;
+    }
+    for (int i = 0; i < n; i++) {
+        psum[i] = i == 0 ? v[i] : v[i] + psum[i - 1];
+    }
+    k-=2;
+    int mx = INT_MIN;
+    int _l, _r;
+    for (int r = k; r < n - 1; r++) {
+        if (mx < psum[r] - psum[r - k + 1] + v[r - k + 1]) {
+            _l = r - k + 1; _r = r; 
+            mx = psum[r] - psum[r - k + 1] + v[r - k + 1];
+        }
+    }
+    cout << mx + 1 << " " << _l << "\n";
 }
 
 /* Main()  function */
