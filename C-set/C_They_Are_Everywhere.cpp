@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/701/C
 */
 
 #include <bits/stdc++.h>
@@ -43,11 +43,11 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
 
+#define MOD 1000000007
 #define PI 3.1415926535897932384626433832795
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-const long long MOD = 1000000007;
 vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
@@ -82,20 +82,38 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+int n;
+string s;
 void solve() {
+    cin >> n >> s;
+    unordered_set<char> st;
+    for (auto c : s)
+        st.insert(c);
+    int k = st.size();
+    unordered_map<char,int> mp;
+    int i = 0, j = 0;
+    int unique = 0, ans = INT_MAX;
+    while (j < n) {
+        mp[s[j]]++;
+        if (mp[s[j]]-1==0) unique++;
 
+        while (unique == k) {
+            ans = min(ans, j - i + 1);
+            mp[s[i]]--;
+            if (mp[s[i]]==0) unique--;
+            i++;
+        }
+
+        j++;
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */
 int main() {
     fastio();
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 /* Main() Ends Here */

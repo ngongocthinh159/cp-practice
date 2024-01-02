@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/edu/course/2/lesson/9/2/practice/contest/307093/problem/F
 */
 
 #include <bits/stdc++.h>
@@ -43,11 +43,11 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
 
+#define MOD 1000000007
 #define PI 3.1415926535897932384626433832795
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-const long long MOD = 1000000007;
 vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
@@ -82,20 +82,34 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int mxN = 1e5 + 5;
+ll n, k;
+ll a[mxN];
 void solve() {
+    cin >> n >> k;
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
+    ll l = 0, r = 0;
+    ll ans = 0;
+    set<pair<ll,ll>> st;
+    while (r < n) {
+        st.insert({a[r], r});
 
+        while ((*st.rbegin()).first - (*st.begin()).first > k) {
+            st.erase({a[l], l});
+            l++;
+        }
+        ans += r - l + 1;
+        r++;
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */
 int main() {
     fastio();
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 /* Main() Ends Here */

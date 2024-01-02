@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/166/E
 */
 
 #include <bits/stdc++.h>
@@ -82,20 +82,51 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve() {
+int n;
+void solve1() {
+    cin >> n;
+    vector<vector<int>> g(4); // A-0, B-1, C-2, D-3
+    g[0] = {1,2,3};
+    g[1] = {0,2,3};
+    g[2] = {0,1,3};
+    g[3] = {0,1,2};
+    vector<vector<int>> dp(4, vector<int>(n + 1, 0));
+    dp[3][0] = 1;
+    for (int i = 1; i <= n; i++) {
+        for (int u = 0; u < 4; u++) {
+            for (auto v : g[u]) {
+                dp[u][i] = (dp[u][i] + dp[v][i - 1])%MOD;
+            }
+        }
+    }
+    cout << dp[3][n] << "\n";
+}
 
+void solve2() {
+    cin >> n;
+    vector<vector<int>> g(4); // A-0, B-1, C-2, D-3
+    g[0] = {1,2,3};
+    g[1] = {0,2,3};
+    g[2] = {0,1,3};
+    g[3] = {0,1,2};
+    vector<vector<int>> dp(4, vector<int>(n + 1, 0));
+    dp[3][n] = 1;
+    for (int i = n - 1; i >= 0; i--) {
+        for (int u = 0; u < 4; u++) {
+            for (auto v : g[u]) {
+                dp[u][i] = (dp[u][i] + dp[v][i + 1])%MOD;
+            }
+        }
+    }
+    cout << dp[3][0] << "\n";
 }
 
 /* Main()  function */
 int main() {
     fastio();
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    // solve1();
+    solve2();
 }
 
 /* Main() Ends Here */

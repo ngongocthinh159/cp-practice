@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/189/A
 */
 
 #include <bits/stdc++.h>
@@ -43,11 +43,11 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
 
+#define MOD 1000000007
 #define PI 3.1415926535897932384626433832795
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-const long long MOD = 1000000007;
 vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
@@ -82,20 +82,39 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve() {
+int n, a, b, c;
+void solve1() {
+    cin >> n >> a >> b >> c;
+    vector<int> dp(n + 1, -1);
+    vector<int> len = {a,b,c};
+    dp[0] = 0;
+    for (int i = 1; i <= n; i++) {
+        for (auto l : len) {
+            if (i - l >= 0 && dp[i - l] != -1) dp[i] = max(dp[i], 1 + dp[i - l]);
+        }
+    }
+    cout << dp[n] << "\n";
+}
 
+void solve2() {
+    cin >> n >> a >> b >> c;
+    vector<int> dp(n + 1, -1);
+    vector<int> len = {a,b,c};
+    dp[n] = 0;
+    for (int i = n - 1; i >= 0; i--) {
+        for (auto l : len) {
+            if (i + l <= n && dp[i + l] != -1) dp[i] = max(dp[i], 1 + dp[i + l]);
+        }
+    }
+    cout << dp[0] << "\n";
 }
 
 /* Main()  function */
 int main() {
     fastio();
     
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    // solve1();
+    solve2();
 }
 
 /* Main() Ends Here */
