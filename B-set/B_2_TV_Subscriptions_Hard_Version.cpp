@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1225/B2
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,28 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int mxN = 2e5 + 5;
+int n, k, d;
+int a[mxN];
 void solve() {
-
+    cin >> n >> k >> d;
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
+    unordered_map<int,int> mp;
+    int unique = 0;
+    for (int i = 0; i < d; i++) {
+        mp[a[i]]++;
+        if (mp[a[i]]-1==0) unique++;
+    }
+    int ans = unique;
+    for (int r = d; r < n; r++) {
+        mp[a[r]]++;
+        if (mp[a[r]]-1==0) unique++;
+        mp[a[r - d]]--;
+        if (mp[a[r - d]]==0) unique--;
+        ans = min(ans, unique);
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */

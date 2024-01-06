@@ -1,5 +1,14 @@
+/**
+ * Solution for: https://codeforces.com/contest/279/problem/B
+*/
+
 #include <bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
 using namespace std;
+using namespace chrono;
+using namespace __gnu_pbds;
 
 /* clang-format off */
 
@@ -29,12 +38,17 @@ template <class T>
 void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cout << "\b}"; }
 
 /* UTILS */
-#define MOD 1000000007
+#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
+
 #define PI 3.1415926535897932384626433832795
 double EPS = 1e-9;
 int INF = 1000000005;
 long long INFF = 1000000000000000005LL;
-ll directions[8][2] = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From dir[4] Right of Up then clock wise
+const long long MOD = 1000000007;
+vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
 #define read(type) readInt<type>()
 ll min(ll a,int b) { if (a<b) return a; return b; }
 ll min(int a,ll b) { if (a<b) return a; return b; }
@@ -47,19 +61,18 @@ string to_lower(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='A' && a
 string int_to_string(ll a) { char x[100]; sprintf(x, "%lld", a); string s = x; return s; }
 ll string_to_int(string a) { char x[100]; ll res; strcpy(x, a.c_str()); sscanf(x, "%lld", &res); return res; }
 bool prime(ll a) { if (a==1) return 0; for (int i=2;i<=round(sqrt(a));++i) if (a%i==0) return 0; return 1; }
-ll mod(ll x) { return (((x%MOD) + MOD) % MOD); }
-ll addMod(ll a, ll b) { return mod(mod(a) + mod(b)); }
-ll subMod(ll a, ll b) { return mod(mod(a) - mod(b)); }
-ll mulMod(ll a, ll b) { return mod(mod(a) * mod(b)); }
-ll powMod(ll x, ll n) { if (n == 0) return 1%MOD; ll u = powMod(mod(x),n/2); u = (u*u)%MOD; if (n%2 == 1) u = (u*(mod(x)))%MOD; return u; } // (x^n)%MOD
-ll powMod(ll x, ll n, ll mod) { if (n == 0) return 1%mod; ll tmp = powMod(x,n/2,mod); if (n%2==0) return (tmp*tmp)%mod; else return (((tmp*tmp)%mod)*(x%mod))%mod; } // Custom mod number
-ll inverseMod(ll a) { if (gcd(a, MOD) != 1) return -1; return powMod(mod(a), MOD-2); } // Return -1 if ((1/a)%MOD) not exist (a and MOD not coprime)
-ll divMod(ll a, ll b) { ll tmp = inverseMod(b); if (tmp == -1) return -1; return (((mod(a))*inverseMod(mod(b)))%MOD); } // Return -1 if ((1/b)%MOD) not exist (b and MOD not coprime)
+ll mod(ll x, ll _mod) { return (((x%_mod) + _mod) % _mod); }
+ll addMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) + mod(b, _mod), _mod); }
+ll subMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) - mod(b, _mod), _mod); }
+ll mulMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) * mod(b, _mod), _mod); }
+ll powMod(ll x, ll n, ll _mod) { if (n == 0) return 1%_mod; ll u = powMod(mod(x,_mod),n/2,_mod); u = (u*u)%_mod; if (n%2 == 1) u = (u*(mod(x,_mod)))%_mod; return u; } // (x^n)%_mod
+ll inverseMod(ll a, ll _mod) { if (gcd(a, _mod) != 1) {cout << "There is no inverse mod of " << a << " and " << _mod << "\n"; return -1;}; return powMod(mod(a,_mod), _mod-2, _mod); } // Return -1 if ((1/a)%_mod) not exist (a and _mod not coprime)
+ll divMod(ll a, ll b, ll _mod) { ll tmp = inverseMod(b, _mod); if (tmp == -1) {cout << "There is no divided mod of " << a << " and " << b << "\n"; return -1;} return (((mod(a, _mod))*inverseMod(mod(b, _mod), _mod))%_mod); } // Return -1 if ((1/b)%_mod) not exist (b and _mod not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
 void OPEN() {
-    freopen("input.txt", "r", stdin);
-	freopen("output.txt", "w", stdout);
+freopen("input.txt", "r", stdin);
+freopen("output.txt", "w", stdout);
 }
 
 /*  All Required define Pre-Processors and typedef Constants */
@@ -69,32 +82,32 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
-void solve();
+const int mxN = 1e5 + 5;
+int n, t;
+int a[mxN];
+void solve() {
+    cin >> n >> t;
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
+    int l = 0, r = 0;
+    int sum = 0;
+    int ans = -INF;
+    while (r < n) {
+        sum += a[r];
+        while (sum > t) {
+            sum -= a[l++];
+        }
+        ans = max(ans, r - l + 1);
+        r++;
+    }
+    cout << ans << "\n";
+}
 
 /* Main()  function */
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-    
-    solve();
-}
+    fastio();
 
-void solve() {
-    int n, t;
-    cin >> n >> t;
-    int books[n];
-    f(i,0,n) cin >> books[i];
-    int l = 0, r = 0, sum = 0, ans = -1;
-    // Always keep [l,r-1] valid, check if [l,r] is valid, if valid => r can be added in range, then increase r for next check
-    // if [l,r] not valid => remove l from range
-    while (r <= n - 1) { 
-        int nextSum = sum + books[r];
-        if (nextSum <= t) sum += books[r++];
-        else if (nextSum > t) sum -= books[l++];
-        ans = max(ans,r-l);
-    }
-    cout << ans << "\n";
+    solve();
 }
 
 /* Main() Ends Here */

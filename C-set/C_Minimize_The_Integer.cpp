@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1251/C
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,25 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+string s;
 void solve() {
-
+    cin >> s;
+    int n = s.size();
+    string odd = "";
+    string even = "";
+    string ans = "";
+    for (auto c : s) {
+        if ((c-'0')&1)odd+=c;
+        else even+=c;
+    }
+    int i = 0, j = 0;
+    while (i < odd.size() && j < even.size()) {
+        if (odd[i] < even[j]) ans+=odd[i++];
+        else ans+=even[j++];
+    }
+    while (i < odd.size()) ans+=odd[i++];
+    while (j < even.size()) ans+=even[j++];
+    cout << ans << "\n";
 }
 
 /* Main()  function */

@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/edu/course/2/lesson/9/3/practice/contest/307094/problem/C
 */
 
 #include <bits/stdc++.h>
@@ -82,20 +82,30 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int mxN = 3e5 + 5;
+int n, k;
+ll d[mxN];
 void solve() {
-
+    cin >> n >> k;
+    for (int i = 0; i < n; i++)
+        cin >> d[i];
+    int l = 0, r = 0;
+    ll ans = 0;
+    while (r < n) {
+        while (d[r] - d[l] > k) {
+            l++;
+        }
+        if (l-1>=0) ans += l;
+        r++;      
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */
 int main() {
     fastio();
 
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 /* Main() Ends Here */

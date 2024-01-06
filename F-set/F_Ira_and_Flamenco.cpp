@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1833/F
 */
 
 #include <bits/stdc++.h>
@@ -82,8 +82,32 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int mxN = 2e5 + 5;
+int n, m;
+int a[mxN];
 void solve() {
-
+    cin >> n >> m;
+    map<int,ll> mp;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        mp[a[i]]++;
+    }
+    vector<int> v;
+    for (auto [key,val] : mp)
+        v.push_back(key);
+    if (v.size() < m) {cout << 0 << "\n"; return;}
+    ll ans = 0;
+    ll prod = 1;
+    for (int i = 0; i < m; i++) {
+        prod = mulMod(prod, mp[v[i]], MOD);
+    }
+    if (v[m - 1] - v[0] < m) ans += prod;
+    for (int i = m; i < v.size(); i++) {
+        prod = divMod(prod, mp[v[i - m]], MOD);
+        prod = mulMod(prod, mp[v[i]], MOD);
+        if (v[i] - v[i - m + 1] < m) ans = addMod(ans, prod, MOD);
+    }
+    cout << ans << "\n";
 }
 
 /* Main()  function */

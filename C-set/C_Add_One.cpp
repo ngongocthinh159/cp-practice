@@ -1,5 +1,5 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1513/C
 */
 
 #include <bits/stdc++.h>
@@ -82,12 +82,37 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int M = 2e5 + 1;
+string n;
+int m;
+int dp[10][M];
 void solve() {
+    cin >> n >> m;
+    
+    ll ans = 0;
+    for (auto c : n) {
+        int digit = c - '0';
+        ans = (ans + dp[digit][m])%MOD;
+    }
+    cout << ans << "\n";
+}
 
+void precompute() {
+    for (int i = 0; i <= 9; i++) {
+        for (int j = 0; j <= 9 - i; j++)
+            dp[i][j] = 1;
+    } 
+    for (int i = 0; i <= 9; i++) {
+        for (int j = 10 - i; j <= 2e5; j++) {
+            dp[i][j] = (dp[0][j - (10 - i) + 1] + dp[0][j - (10 - i)])%MOD;
+        }
+    }
 }
 
 /* Main()  function */
 int main() {
+    precompute();
+
     fastio();
 
     ll cases;
