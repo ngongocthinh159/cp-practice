@@ -4,5 +4,6 @@
 
 input.txt
 output.txt
+error.txt
 
 program.cpp
