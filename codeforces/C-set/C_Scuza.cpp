@@ -1,10 +1,10 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1742/E
 */
 
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
 using namespace chrono;
@@ -38,6 +38,7 @@ template <class T>
 void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cout << "\b}"; }
 
 /* UTILS */
+#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
@@ -69,12 +70,9 @@ ll inverseMod(ll a, ll _mod) { if (gcd(a, _mod) != 1) {cout << "There is no inve
 ll divMod(ll a, ll b, ll _mod) { ll tmp = inverseMod(b, _mod); if (tmp == -1) {cout << "There is no divided mod of " << a << " and " << b << "\n"; return -1;} return (((mod(a, _mod))*inverseMod(mod(b, _mod), _mod))%_mod); } // Return -1 if ((1/b)%_mod) not exist (b and _mod not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
-#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
-void IN_OUT() {
-#ifndef ONLINE_JUDGE
+void OPEN() {
 freopen("input.txt", "r", stdin);
 freopen("output.txt", "w", stdout);
-#endif
 }
 
 /*  All Required define Pre-Processors and typedef Constants */
@@ -84,13 +82,39 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+const int mxN = 2e5 + 5;
+int n, q;
+int a[mxN];
 void solve() {
-
+    cin >> n >> q;
+    vector<pair<int,int>> v;
+    vector<ll> h;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        h.push_back(i == 0 ? a[i] : 1LL*a[i] + h[i - 1]);
+    }
+    vector<pair<int,int>> k(q);
+    vector<ll> res(q, 0);
+    for (int i = 0; i < q; i++) {
+        int val; cin >> val;
+        k[i] = {val, i};
+    }
+    sort(k.begin(), k.end());
+    int l = 0, r = -1;
+    for (int i = 0; i < q; i++) {
+        int cur = k[i].first;
+        int idx = k[i].second;
+        while (r + 1 < n && a[r + 1] <= cur) r++;
+        if (r != -1) res[idx] = h[r];
+    }
+    for (auto num : res) {
+        cout << num << " ";
+    }
+    cout << "\n";
 }
 
 /* Main()  function */
 int main() {
-    IN_OUT();
     fastio();
 
     ll cases;

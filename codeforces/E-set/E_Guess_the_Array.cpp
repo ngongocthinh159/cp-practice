@@ -1,10 +1,10 @@
 /**
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/727/C
 */
 
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
 using namespace chrono;
@@ -38,6 +38,7 @@ template <class T>
 void print_v(vector<T> &v) { cout << "{"; for (auto x : v) cout << x << ","; cout << "\b}"; }
 
 /* UTILS */
+#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
@@ -69,12 +70,9 @@ ll inverseMod(ll a, ll _mod) { if (gcd(a, _mod) != 1) {cout << "There is no inve
 ll divMod(ll a, ll b, ll _mod) { ll tmp = inverseMod(b, _mod); if (tmp == -1) {cout << "There is no divided mod of " << a << " and " << b << "\n"; return -1;} return (((mod(a, _mod))*inverseMod(mod(b, _mod), _mod))%_mod); } // Return -1 if ((1/b)%_mod) not exist (b and _mod not coprime)
 void yes() { cout<<"YES\n"; }
 void no() { cout<<"NO\n"; }
-#define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
-void IN_OUT() {
-#ifndef ONLINE_JUDGE
+void OPEN() {
 freopen("input.txt", "r", stdin);
 freopen("output.txt", "w", stdout);
-#endif
 }
 
 /*  All Required define Pre-Processors and typedef Constants */
@@ -84,21 +82,37 @@ typedef long long int int64;
 typedef unsigned long long int  uint64;
 
 /* clang-format on */
+int n;
+int query(int i, int j) {
+    cout << "? " << i << " " << j << endl;
+    int res; cin >> res;
+    return res;
+}
 void solve() {
-
+    cin >> n;
+    vector<int> a(n + 1);
+    int x = query(1,2);
+    int y = query(2,3);
+    int z = query(1,3);
+    a[2] = (x + y - z)/2;
+    a[1] = x - a[2];
+    a[3] = z - a[1];
+    for (int i = 4; i <= n; i++) {
+        int res = query(i - 1, i);
+        a[i] = res - a[i - 1];
+    }
+    string ans = "! ";
+    for (int i = 1; i <= n; i++) {
+        ans += to_string(a[i]) + " ";
+    }
+    cout << ans << endl;
 }
 
 /* Main()  function */
 int main() {
-    IN_OUT();
     fastio();
 
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
-        solve();
-    }
+    solve();
 }
 
 /* Main() Ends Here */
