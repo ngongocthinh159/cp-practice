@@ -14,6 +14,7 @@ using namespace __gnu_pbds;
 
 /* TYPES  */
 #define ll long long
+#define ull unsigned long long
 #define pii pair<int, int>
 #define pll pair<long long, long long>
 #define vi vector<int>
@@ -99,6 +100,8 @@ int main() {
     while (cases--) {
         solve();
     }
+    
+    return 0;
 }
 
 /* Main() Ends Here */
