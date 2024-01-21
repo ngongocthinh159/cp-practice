@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1850/F
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -85,8 +85,25 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+int n;
 void solve() {
-
+    cin >> n;
+    vector<ll> a(n + 1, 0);
+    unordered_map<ll, int> mp;
+    for (int i = 0; i < n; i++) {
+        ll val; cin >> val;
+        if (val <= n) mp[val]++;
+    }
+    ll ans = 0;
+    for (auto &[key,val] : mp) {
+        ll hop = key;
+        ll cnt = val;
+        for (int i = hop; i <= n; i+=hop) {
+            a[i] += cnt;
+            ans = max(ans, a[i]);
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {
@@ -96,7 +113,11 @@ int main() {
     fastio();
     IN_OUT();
     auto start1 = high_resolution_clock::now();
+    int cases; cin >> cases;
+    while (cases--) {
     solve();
+
+    }
     auto stop1 = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop1 - start1);
 #ifdef ThinhNgo

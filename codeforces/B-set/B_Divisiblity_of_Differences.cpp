@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/876/problem/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -67,8 +67,7 @@ void _print(pbds v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} ce
  
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 /*---------------------------------------------------------------------------------------------------------------------------*/
-ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;} // only a >= 0 && b >= 0
-ll gcd(ll a, ll b) {a = abs(a); b = abs(b); return __gcd__(a, b);} // get abs(a), abs(b) in case a < 0 || b < 0
+ll gcd(ll a, ll b) {if (b > a) {return gcd(b, a);} if (b == 0) {return a;} return gcd(b, a % b);}
 ll expo(ll a, ll b, ll mod) {if (a==0) return 1%mod; ll res = 1; while (b > 0) {if (b & 1)res = (res * a) % mod; a = (a * a) % mod; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
 void extendgcd(ll a, ll b, ll*v) {if (b == 0) {v[0] = 1; v[1] = 0; v[2] = a; return ;} extendgcd(b, a % b, v); ll x = v[1]; v[1] = v[0] - v[1] * (a / b); v[0] = x; return;} //pass an arry of size1 3
 ll mminv(ll a, ll b) {ll arr[3]; extendgcd(a, b, arr); return arr[0];} //for non prime b
@@ -85,8 +84,26 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+int n, k, m;
 void solve() {
-
+    cin >> n >> k >> m;
+    unordered_map<int,vector<int>> mp;
+    bool ok = false;
+    vector<int> *res;
+    for (int i = 0; i < n; i++) {
+        int val;
+        cin >> val;
+        auto &list = mp[val%m];
+        res = &list;
+        list.emplace_back(val);
+        if (list.size() >= k) {ok = true; break;} 
+    }
+    if (ok) {
+        cout << "Yes" << nline;
+        for (auto num : *res)
+            cout << num << " ";
+        cout << "\n";
+    } else cout << "No" << nline;
 }
 
 int main() {

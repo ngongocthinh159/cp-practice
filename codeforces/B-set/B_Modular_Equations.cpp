@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/495/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -85,8 +85,29 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-void solve() {
+// O(sqrt(N))
+vector<long long> findFactors(long long n) {
+    vector<long long> factors;
+    for (long long p = 1; p * p <= n; p++) {
+        if (n % p == 0) {
+            factors.push_back(p);
+            long long q = n / p;
+            if (q != p) factors.push_back(q); // Check case: N = p*p
+        }
+    }
+    return factors;
+}
 
+ll a, b;
+void solve() {
+    cin >> a >> b;
+    if (a==b) {cout << "infinity" << nline; return;}
+    auto factors = findFactors(abs(a-b));
+    ll ans = 0;
+    for (auto f : factors) {
+        if (f > b) ans++;
+    }
+    cout << ans << nline;
 }
 
 int main() {

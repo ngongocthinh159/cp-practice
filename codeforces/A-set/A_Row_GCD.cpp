@@ -1,9 +1,7 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1458/A
 */
-#pragma GCC optimize("O3,unroll-loops")
- 
 #include<bits/stdc++.h>
 #include<ext/pb_ds/assoc_container.hpp>
 #include<ext/pb_ds/tree_policy.hpp>
@@ -11,7 +9,7 @@
 using namespace std;
 using namespace chrono;
 using namespace __gnu_pbds;
-
+ 
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
 #ifndef ONLINE_JUDGE
@@ -32,7 +30,7 @@ freopen("Output.txt", "w", stdout);
 #define set_bits(x) __builtin_popcountll(x)
 #define sz(x) ((int)(x).size())
 #define all(x) (x).begin(), (x).end()
-
+ 
 // #define ThinhNgo
 #ifdef ThinhNgo
 #define debug(x) cerr << #x<<" "; _print(x); cerr << endl;
@@ -67,8 +65,8 @@ void _print(pbds v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} ce
  
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 /*---------------------------------------------------------------------------------------------------------------------------*/
-ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;} // only a >= 0 && b >= 0
-ll gcd(ll a, ll b) {a = abs(a); b = abs(b); return __gcd__(a, b);} // get abs(a), abs(b) in case a < 0 || b < 0
+ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;}
+ll gcd(ll a, ll b) {a = abs(a); b = abs(b); return __gcd__(a, b);} // get abs(a), abs(b) in case a < 0, b < 0
 ll expo(ll a, ll b, ll mod) {if (a==0) return 1%mod; ll res = 1; while (b > 0) {if (b & 1)res = (res * a) % mod; a = (a * a) % mod; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
 void extendgcd(ll a, ll b, ll*v) {if (b == 0) {v[0] = 1; v[1] = 0; v[2] = a; return ;} extendgcd(b, a % b, v); ll x = v[1]; v[1] = v[0] - v[1] * (a / b); v[0] = x; return;} //pass an arry of size1 3
 ll mminv(ll a, ll b) {ll arr[3]; extendgcd(a, b, arr); return arr[0];} //for non prime b
@@ -84,21 +82,31 @@ ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprim
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-
+ 
+int n, m;
 void solve() {
-
+    cin >> n >> m;
+    ll a[n];
+    ll tmp;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        if (i == 1) tmp = a[i] - a[i - 1];
+        if (i >= 1) tmp = gcd(tmp, a[i] - a[i - 1]);
+    }
+    for (int i = 0; i < m; i++) {
+        ll val; cin >> val;
+        if (n != 1) cout << gcd(tmp, a[0] + val) << " ";
+        else cout << a[0] + val << " ";
+    }
 }
-
+ 
 int main() {
 #ifdef ThinhNgo
     freopen("Error.txt", "w", stderr);
 #endif
     fastio();
     IN_OUT();
-    auto start1 = high_resolution_clock::now();
     solve();
-    auto stop1 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop1 - start1);
 #ifdef ThinhNgo
     cerr << "Time: " << duration . count() / 1000 << " ms" << endl;
 #endif

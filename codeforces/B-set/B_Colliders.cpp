@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/154/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -85,8 +85,73 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-void solve() {
+vector<ll> spf;
+void _sieve(ll n) {
+    spf = vector<ll>(n + 1, 0);
+    for (ll i = 1; i <=n; i++) {
+        spf[i] = i;
+    }
+    for (ll i = 2; i <= n; i++) {
+        if (spf[i] == i) {
+            for (ll j = i*i; j<=n; j+=i) {
+                spf[j] = min(spf[j], i);
+            }
+        }
+    }
+}
+vector<pair<int,int>> primeFactorize(ll n) {
+    vector<pair<int,int>> res;
+    while (n != 1) {
+        ll factor = spf[n];
+        ll power = 0;
+        while (n % factor == 0) {
+            power++;
+            n/=factor;
+        }
+        res.push_back({factor,power});
+    }
+    return res;
+}
 
+int n, m;
+void solve() {
+    cin >> n >> m;
+    _sieve(n);
+    unordered_set<ll> st;
+    unordered_map<ll,ll> mp;
+    for (int i = 0; i < m; i++) {
+        char op; cin >> op;
+        ll val; cin >> val;
+        if (op == '+') {
+            if (st.count(val)) cout << "Already on" << nline;
+            else  {
+                auto mp2 = primeFactorize(val);
+                bool add = true; 
+                ll conflict;
+                for (auto &[key,_val] : mp2) {
+                    if(mp.count(key)) {add = false; conflict = mp[key]; break;}
+                }
+                if (!add) cout << "Conflict with " << conflict << nline;
+                else {
+                    st.insert(val);
+                    for (auto &[key, _val] : mp2) {
+                        mp[key] = val;
+                    }
+                    cout << "Success" << nline;
+                }
+            }
+        } else if (op == '-') {
+            if (!st.count(val)) cout << "Already off" << nline;
+            else {
+                auto mp2 = primeFactorize(val);
+                for (auto &[key,val] : mp2) {
+                    mp.erase(key);
+                }
+                st.erase(val);
+                cout << "Success" << nline;
+            } 
+        }
+    }
 }
 
 int main() {
