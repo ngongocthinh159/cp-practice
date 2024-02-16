@@ -11,7 +11,7 @@
 using namespace std;
 using namespace chrono;
 using namespace __gnu_pbds;
-
+ 
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
 #ifndef ONLINE_JUDGE
@@ -32,7 +32,7 @@ freopen("Output.txt", "w", stdout);
 #define set_bits(x) __builtin_popcountll(x)
 #define sz(x) ((int)(x).size())
 #define all(x) (x).begin(), (x).end()
-
+ 
 // #define ThinhNgo
 #ifdef ThinhNgo
 #define debug(x) cerr << #x<<" "; _print(x); cerr << endl;
@@ -85,10 +85,12 @@ ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprim
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-
+ 
 const int mxN = 2e5 + 5;
+const int N = 1e6 + 5;
 ll n;
 ll a[mxN];
+ll freq[N];
 void solve() {
     int cases; cin >> cases;
     while (cases--) {
@@ -97,22 +99,22 @@ void solve() {
             cin >> a[i];
         }
         sort(a,a+n);
-        unordered_map<ll,ll> mp;
-        mp[a[0]]++; mp[a[1]]++;
+        freq[a[n-1]]++; freq[a[n-2]]++;
         ll ans = 0;
-        for (ll i = 2; i < n; i++) {
-            if (mp[a[i]]) ans += mp[a[i]]*(mp[a[i]] - 1)*3;
-            for (ll b = 2; 1LL*b*b <= a[i]; b++) {
-                if (a[i]%b==0 && a[i]%(b*b)==0) {
-                    ans += mp[a[i]/b]*mp[a[i]/(b*b)];
-                }
+        for (ll i = n-3; i >= 0; i--) {
+            ans += 1LL*freq[a[i]]*(freq[a[i]]-1)*3;
+            for (ll b = 2; b*b*a[i] <= 1000000; b++) {
+                ans += freq[a[i]*b]*freq[a[i]*b*b];
             }
-            mp[a[i]]++;
+            freq[a[i]]++;
+        }
+        for (int i = 0; i < n; i++) {
+            freq[a[i]]--;
         }
         cout << ans << nline;
     }
 }
-
+ 
 int main() {
 #ifdef ThinhNgo
     freopen("Error.txt", "w", stderr);

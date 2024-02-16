@@ -2,80 +2,112 @@
  * Author: Thinh Ngo Ngoc
  * Solution for: 
 */
-
-#include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-
+#pragma GCC optimize("O3,unroll-loops")
+ 
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+ 
 using namespace std;
 using namespace chrono;
 using namespace __gnu_pbds;
 
-/* TYPES  */
-#define ll long long
-#define ull unsigned long long
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
-
-/* CONSTANTS  */
-const double PI = 3.1415926535897932384626433832795;
-const double EPS = 1e-9;
-int INF = 1000000005;
-long long INFF = 1000000000000000005LL;
-const long long MOD = 1000000007;
-vector<pair<ll,ll>> moves = {{-1,0},{0,1},{1,0},{0,-1},{-1,1},{1,1},{1,-1},{-1,-1}}; // UP-RIGHT-BOTTOM-DOWN || NORTH-EAST-SOUTH-WEST, From moves[4] Right of Up then clock wise
-
-/* UTILS */
-ll min(ll a,int b) { if (a<b) return a; return b; }
-ll min(int a,ll b) { if (a<b) return a; return b; }
-ll max(ll a,int b) { if (a>b) return a; return b; }
-ll max(int a,ll b) { if (a>b) return a; return b; }
-ll gcd(ll a,ll b) { if (b==0) return a; return gcd(b, a%b); } // Greatest common divisor (Uoc chung lon nhat): O(log(min(a,b))
-ll lcm(ll a,ll b) { return a/gcd(a,b)*b; } // Lowest common mutiple (Boi chung nho nhat): O(log(min(a,b))
-string to_upper(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='a' && a[i]<='z') a[i]-='a'-'A'; return a; }
-string to_lower(string a) { for (int i=0;i<(int)a.size();++i) if (a[i]>='A' && a[i]<='Z') a[i]+='a'-'A'; return a; }
-string int_to_string(ll a) { char x[100]; sprintf(x, "%lld", a); string s = x; return s; }
-ll string_to_int(string a) { char x[100]; ll res; strcpy(x, a.c_str()); sscanf(x, "%lld", &res); return res; }
-bool prime(ll a) { if (a==1) return 0; for (int i=2;i<=round(sqrt(a));++i) if (a%i==0) return 0; return 1; }
-ll getRandomNumber(ll l, ll r) { return uniform_int_distribution<ll>(l, r)(rng); } // get rand in [l, r)
-ll mod(ll x, ll _mod) { return (((x%_mod) + _mod) % _mod); }
-ll addMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) + mod(b, _mod), _mod); }
-ll subMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) - mod(b, _mod), _mod); }
-ll mulMod(ll a, ll b, ll _mod) { return mod(mod(a, _mod) * mod(b, _mod), _mod); }
-ll powMod(ll x, ll n, ll _mod) { if (n == 0) return 1%_mod; ll u = powMod(mod(x,_mod),n/2,_mod); u = (u*u)%_mod; if (n%2 == 1) u = (u*(mod(x,_mod)))%_mod; return u; } // (x^n)%_mod
-ll inverseMod(ll a, ll _mod) { assert(gcd(a, _mod) == 1); return powMod(mod(a,_mod), _mod-2, _mod); } // Raise error if (a and _mod not coprime)
-ll divMod(ll a, ll b, ll _mod) { ll tmp = inverseMod(b, _mod); if (tmp == -1) {cout << "There is no divided mod of " << a << " and " << b << "\n"; return -1;} return (((mod(a, _mod))*inverseMod(mod(b, _mod), _mod))%_mod); } // Return -1 if ((1/b)%_mod) not exist (b and _mod not coprime)
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
 #ifndef ONLINE_JUDGE
-freopen("input.txt", "r", stdin);
-freopen("output.txt", "w", stdout);
+freopen("Input.txt", "r", stdin);
+freopen("Output.txt", "w", stdout);
 #endif
 }
+#define MOD 1000000007
+#define MOD1 998244353
+#define INF 1e18
+#define nline "\n"
+#define pb push_back
+#define ppb pop_back
+#define mp make_pair
+#define ff first
+#define ss second
+#define PI 3.141592653589793238462
+#define set_bits(x) __builtin_popcountll(x)
+#define sz(x) ((int)(x).size())
+#define all(x) (x).begin(), (x).end()
 
-/*  All Required define Pre-Processors and typedef Constants */
-typedef long int int32;
-typedef unsigned long int uint32;
-typedef long long int int64;
-typedef unsigned long long int  uint64;
+// #define ThinhNgo
+#ifdef ThinhNgo
+#define debug(x) cerr << #x<<" "; _print(x); cerr << endl;
+#else
+#define debug(x);
+#endif
+ 
+using ll = long long;
+using ull = unsigned long long;
+using lld = long double;
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
+ 
+void _print(ll t) {cerr << t;}
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(lld t) {cerr << t;}
+void _print(double t) {cerr << t;}
+void _print(ull t) {cerr << t;}
+ 
+template <class T, class V> void _print(pair <T, V> p);
+template <class T> void _print(vector <T> v);
+template <class T> void _print(set <T> v);
+template <class T, class V> void _print(map <T, V> v);
+template <class T> void _print(multiset <T> v);
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.ff); cerr << ","; _print(p.ss); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+void _print(pbds v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+ 
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+/*---------------------------------------------------------------------------------------------------------------------------*/
+ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;} // only a >= 0 && b >= 0
+ll gcd(ll a, ll b) {a = abs(a); b = abs(b); return __gcd__(a, b);} // get abs(a), abs(b) in case a < 0 || b < 0
+ll expo(ll a, ll b, ll mod) {if (a==0) return 1%mod; ll res = 1; while (b > 0) {if (b & 1)res = (res * a) % mod; a = (a * a) % mod; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
+ll expo(ll a, ll b) {ll res = 1; while (b > 0) {if (b & 1)res = res * a; a = a * a; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
+void extendgcd(ll a, ll b, ll*v) {if (b == 0) {v[0] = 1; v[1] = 0; v[2] = a; return ;} extendgcd(b, a % b, v); ll x = v[1]; v[1] = v[0] - v[1] * (a / b); v[0] = x; return;} //pass an arry of size1 3
+ll mminv(ll a, ll b) {ll arr[3]; extendgcd(a, b, arr); return arr[0];} //for non prime b
+ll mminvprime(ll a, ll b) {assert(gcd(a, b) == 1); return expo(a, b - 2, b);} // inverse mod: a^-1 % b = a^(b-2) % b. When gcd(a,b)=1 (or b prime)
+bool revsort(ll a, ll b) {return a > b;}
+ll combination(ll n, ll r, ll m, ll *fact, ll *ifact) {ll val1 = fact[n]; ll val2 = ifact[n - r]; ll val3 = ifact[r]; return (((val1 * val2) % m) * val3) % m;}
+void google(int t) {cout << "Case #" << t << ": ";}
+vector<ll> sieve(int n) {int*arr = new int[n + 1](); vector<ll> vect; for (int i = 2; i <= n; i++)if (arr[i] == 0) {vect.push_back(i); for (int j = 2 * i; j <= n; j += i)arr[j] = 1;} return vect;}
+ll mod_add(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a + b) % m) + m) % m;}
+ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) % m;}
+ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
+ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
+ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
+ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+/*--------------------------------------------------------------------------------------------------------------------------*/
+// #define ThinhNgo_use_cases
 
-/* Main Program */
 void solve() {
 
 }
 
 int main() {
-    IN_OUT();
+#ifdef ThinhNgo
+    freopen("Error.txt", "w", stderr);
+#endif
     fastio();
-
-    ll cases;
-    cin >> cases;
-
-    while (cases--) {
+    IN_OUT();
+    auto start1 = high_resolution_clock::now();
+    int T = 1;
+#ifdef ThinhNgo_use_cases
+    cin >> T;
+#endif
+    while (T--) {
         solve();
     }
-    
-    return 0;
+    auto stop1 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop1 - start1);
+#ifdef ThinhNgo
+    cerr << "Time: " << duration . count() / 1000 << " ms" << endl;
+#endif
 }
-
-/* Main Program End Here */
