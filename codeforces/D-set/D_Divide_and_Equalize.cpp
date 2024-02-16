@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1881/D
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -86,8 +86,52 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+ll mxN = 1e6 + 5;
+vector<ll> spf(mxN + 1);
+void _spf() {
+    for (ll i = 1; i <= mxN; i++) {
+        spf[i] = i;
+    }
+    for (ll i = 2; i <= mxN; i++) {
+        if (spf[i] == i) {
+            for (ll j = i*i; j <= mxN; j+=i) {
+                spf[j] = min(spf[j], i);
+            }
+        }
+    }
+}
+vector<pair<ll,ll>> primeFactorize(ll n) {
+    vector<pair<ll,ll>> res;
+    while (n != 1) {
+        ll sf = spf[n];
+        ll cnt = 0;
+        while (n%sf==0){cnt++; n/=sf;}
+        res.push_back({sf,cnt});
+    }
+    return res;
+}
+    
+int cases;
+ll n;
 void solve() {
-
+    cin >> cases;
+    _spf();
+    while (cases--) {
+        cin >> n;
+        unordered_map<int,ll>mp;
+        for (ll i = 0; i < n; i++) {
+            ll val; cin >> val;
+            auto res = primeFactorize(val);
+            for (auto &[key,cnt]:res) {
+                mp[key]+=cnt;
+            }
+        }
+        bool ok = true;
+        for (auto &[key,val]:mp) {
+            if (val%n!=0){cout << "NO" << nline; ok=false; break;}
+        }
+        if (ok) cout << "YES" << nline;
+    }
 }
 
 int main() {

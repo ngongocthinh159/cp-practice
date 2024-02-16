@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1822/G1
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -86,8 +86,31 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+const int mxN = 2e5 + 5;
+ll n;
+ll a[mxN];
 void solve() {
-
+    int cases; cin >> cases;
+    while (cases--) {
+        cin >> n;
+        for (ll i = 0; i < n; i++) {
+            cin >> a[i];
+        }
+        sort(a,a+n);
+        unordered_map<ll,ll> mp;
+        mp[a[0]]++; mp[a[1]]++;
+        ll ans = 0;
+        for (ll i = 2; i < n; i++) {
+            if (mp[a[i]]) ans += mp[a[i]]*(mp[a[i]] - 1)*3;
+            for (ll b = 2; 1LL*b*b <= a[i]; b++) {
+                if (a[i]%b==0 && a[i]%(b*b)==0) {
+                    ans += mp[a[i]/b]*mp[a[i]/(b*b)];
+                }
+            }
+            mp[a[i]]++;
+        }
+        cout << ans << nline;
+    }
 }
 
 int main() {

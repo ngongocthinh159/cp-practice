@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1876/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -86,8 +86,31 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+const int _MOD = 998244353;
+const int mxN = 1e5 + 5;
+ll n;
+ll a[mxN];
+ll b[mxN];
+ll _2pow[mxN];
 void solve() {
-
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        _2pow[i] = i == 0 ? 1 : (_2pow[i-1]*2)%_MOD;
+    }
+    for (int i = n-1; i >=0; i--) {
+        b[i] = -1;
+        for (int j = i; j < n; j += (i+1)) {
+            b[i] = max(b[i], a[j]);
+        }
+    }
+    sort(b,b+n);
+    ll ans = 0;
+    for (int i = 0; i < n; i++) {
+        int len = i;
+        ans = mod_add(ans, mod_mul(b[i],_2pow[len],_MOD), _MOD);
+    }
+    cout << ans << nline;
 }
 
 int main() {

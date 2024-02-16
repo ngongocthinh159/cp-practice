@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc169/tasks/abc169_d
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -86,8 +86,33 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+ll n;
 void solve() {
-
+    cin >> n;
+    int mxN = 1e6 + 5;
+    ll ans = 0;
+    for (ll i = 2; i <= sqrt(n); i == 2 ? i++ : i += 2) {
+        if (n % i == 0) {
+            ll cnt = 0;
+            while (n%i==0) {
+                cnt++;
+                n /= i;
+            }
+            ll l = 1, r = cnt, best;
+            while (l <= r) {
+                ll m = l + (r - l)/2;
+                if (m*(m+1)/2 <= cnt) {
+                    best = m;
+                    l = m + 1;
+                } else {
+                    r = m - 1;
+                }
+            }
+            ans += best;
+        }
+    }
+    if (n != 1) ans += 1;
+    cout << ans << nline;
 }
 
 int main() {
