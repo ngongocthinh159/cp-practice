@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/57/problem/C
+ * Solution for: https://codeforces.com/contest/888/problem/D
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -109,10 +109,10 @@ struct Combinatoric {
             ifact[i] = mod_mul(ifact[i + 1], i + 1, this->mod);
         }
     }
-    vector<ll> getFactArray() {
+    vector<ll> &getFactArray() {
         return this->fact;
     }
-    vector<ll> getIFactArray() {
+    vector<ll> &getIFactArray() {
         return this->ifact;
     }
 
@@ -121,38 +121,41 @@ struct Combinatoric {
     // require: r <= n 
     // O(1)
     ll combination1(ll n, ll r) {
+        assert(n <= this->mxN);
+        assert(r <= n);
+
         return mod_mul(fact[n], mod_mul(ifact[r], ifact[n - r], this->mod), this->mod);
     }
 };
 // C(n,r): in O(r + log(mod)) each time
 // Use when call C(n,r) a few times or n is to large (r is still acceptable)
-ll combination_Or(ll n, ll r, ll mod) {
-    ll numerator = 1;
-    ll denominator = 1;
-    for (ll i = n; i >= n - r + 1; i--) {
-        numerator = mod_mul(numerator, i, mod);
+ll combination_Or(ll n, ll r) {
+    assert(r <= n);
+
+    ll res = 1;
+    for (int i = 1; i <= r; i++) {
+        res = res * (n - r + i) / i;
     }
-    for (ll i = 1; i <= r; i++) {
-        denominator = mod_mul(denominator, i, mod);
-    }
-    ll i_denominator = mminvprime(denominator, mod);
-    return mod_mul(numerator, i_denominator, mod);
+    return res;
 }
 
-int n;
+
+
+ll n, k;
 void solve() {
-    cin >> n;
-    Combinatoric cb(2*n);
-    ll ans = combination_Or(2*n-1,n,MOD)*2;
-    ans = mod_sub(ans,n,MOD);
-    // for (int i = 1; i <= n; i++) {
-    //     ll a = cb.combination1(n,i);
-    //     ll b = cb.combination1(n-1,i-1);
-    //     ll tmp = mod_mul(a,b,MOD);
-    //     ans = mod_add(ans,tmp,MOD);
-    // }
-    // ans = mod_mul(ans,2,MOD);
-    // ans = mod_sub(ans,n,MOD);
+    cin >> n >> k;
+    vector<ll> d(n+1);
+    d[0] = 1;
+    d[1] = 0;
+    d[2] = 1;
+    for (ll i = 3; i <= n; i++) {
+        d[i] = 1LL*(i-1)*(d[i-1] + d[i-2]);
+    }
+    Combinatoric cb(n);
+    ll ans = 0;
+    for (ll i = n - k; i <= n; i++) {
+        ans = ans + combination_Or(n,i)*d[n-i];
+    }
     cout << ans << nline;
 }
 

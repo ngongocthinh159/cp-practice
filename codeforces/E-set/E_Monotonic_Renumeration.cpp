@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/57/problem/C
+ * Solution for: https://codeforces.com/problemset/problem/1102/E
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,74 +87,31 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
-struct Combinatoric {
-    ll mxN;
-    vector<ll> fact;
-    vector<ll> ifact;
-    const int mod = 1e9 + 7;
-    Combinatoric(ll mxN) {
-        this->mxN = mxN;
-        fact.resize(mxN+1);
-        ifact.resize(mxN+1);
-        pre_compute();
-    }
-    // O(n): pre_compute factorial and inverse factorial of mxN
-    void pre_compute() {
-        fact[0] = 1;
-        for (ll i = 1; i <= this->mxN; i++) {
-            fact[i] = mod_mul(i, fact[i-1], this->mod);
-        }
-        ifact[this->mxN] = mminvprime(fact[this->mxN], this->mod);
-        for (ll i = this->mxN - 1; i >= 0; i--) {
-            ifact[i] = mod_mul(ifact[i + 1], i + 1, this->mod);
-        }
-    }
-    vector<ll> getFactArray() {
-        return this->fact;
-    }
-    vector<ll> getIFactArray() {
-        return this->ifact;
-    }
-
-    // C(n,r): number of ways to choose r items among n unique items
-    // require: pre_compute of fact[mxN] and ifact[mxN] (factorial and inverse factorial)
-    // require: r <= n 
-    // O(1)
-    ll combination1(ll n, ll r) {
-        return mod_mul(fact[n], mod_mul(ifact[r], ifact[n - r], this->mod), this->mod);
-    }
-};
-// C(n,r): in O(r + log(mod)) each time
-// Use when call C(n,r) a few times or n is to large (r is still acceptable)
-ll combination_Or(ll n, ll r, ll mod) {
-    ll numerator = 1;
-    ll denominator = 1;
-    for (ll i = n; i >= n - r + 1; i--) {
-        numerator = mod_mul(numerator, i, mod);
-    }
-    for (ll i = 1; i <= r; i++) {
-        denominator = mod_mul(denominator, i, mod);
-    }
-    ll i_denominator = mminvprime(denominator, mod);
-    return mod_mul(numerator, i_denominator, mod);
-}
-
+const int mxN = 2e5 +5;
+const ll mod = 998244353;
 int n;
+int a[mxN];
 void solve() {
     cin >> n;
-    Combinatoric cb(2*n);
-    ll ans = combination_Or(2*n-1,n,MOD)*2;
-    ans = mod_sub(ans,n,MOD);
-    // for (int i = 1; i <= n; i++) {
-    //     ll a = cb.combination1(n,i);
-    //     ll b = cb.combination1(n-1,i-1);
-    //     ll tmp = mod_mul(a,b,MOD);
-    //     ans = mod_add(ans,tmp,MOD);
-    // }
-    // ans = mod_mul(ans,2,MOD);
-    // ans = mod_sub(ans,n,MOD);
+    unordered_map<int,int> mp;
+    mp.reserve(1e7);
+    mp.max_load_factor(0.25);
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        mp[a[i]] = i;
+    }  
+    int ans = 1;
+    for (int i = 0; i < n; ) {
+        int last_idx = mp[a[i]];
+        for (int j = i+1; j <= last_idx; j++) {
+            last_idx = max(last_idx,mp[a[j]]);
+        }
+        i = last_idx+1;
+        if (i < n) ans = mod_mul(ans,2,mod);
+    }
     cout << ans << nline;
 }
+
 
 int main() {
 #ifdef ThinhNgo

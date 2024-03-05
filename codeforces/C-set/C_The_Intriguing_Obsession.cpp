@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/57/problem/C
+ * Solution for: https://codeforces.com/problemset/problem/869/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -86,12 +86,11 @@ ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
-
 struct Combinatoric {
     ll mxN;
     vector<ll> fact;
     vector<ll> ifact;
-    const int mod = 1e9 + 7;
+    const int mod = 998244353;
     Combinatoric(ll mxN) {
         this->mxN = mxN;
         fact.resize(mxN+1);
@@ -109,10 +108,10 @@ struct Combinatoric {
             ifact[i] = mod_mul(ifact[i + 1], i + 1, this->mod);
         }
     }
-    vector<ll> getFactArray() {
+    vector<ll> &getFactArray() {
         return this->fact;
     }
-    vector<ll> getIFactArray() {
+    vector<ll> &getIFactArray() {
         return this->ifact;
     }
 
@@ -121,12 +120,17 @@ struct Combinatoric {
     // require: r <= n 
     // O(1)
     ll combination1(ll n, ll r) {
+        assert(n <= this->mxN);
+        assert(r <= n);
+
         return mod_mul(fact[n], mod_mul(ifact[r], ifact[n - r], this->mod), this->mod);
     }
 };
 // C(n,r): in O(r + log(mod)) each time
 // Use when call C(n,r) a few times or n is to large (r is still acceptable)
 ll combination_Or(ll n, ll r, ll mod) {
+    assert(r <= n);
+
     ll numerator = 1;
     ll denominator = 1;
     for (ll i = n; i >= n - r + 1; i--) {
@@ -139,21 +143,29 @@ ll combination_Or(ll n, ll r, ll mod) {
     return mod_mul(numerator, i_denominator, mod);
 }
 
-int n;
+ll a, b, c;
+const int mod = 998244353;
+ll compute(ll a, ll b, Combinatoric &cb) {
+    ll mn = min(a, b);
+    ll res = 1;
+    for (ll i = 1; i <= mn; i++) {
+        ll val1 = cb.combination1(a,i);
+        ll val2 = cb.combination1(b,i);
+        ll val3 = cb.getFactArray()[i];
+        ll val = mod_mul(val1, mod_mul(val2,val3,mod), mod);
+        res = mod_add(res,val,mod);
+    }
+    return res;
+}
 void solve() {
-    cin >> n;
-    Combinatoric cb(2*n);
-    ll ans = combination_Or(2*n-1,n,MOD)*2;
-    ans = mod_sub(ans,n,MOD);
-    // for (int i = 1; i <= n; i++) {
-    //     ll a = cb.combination1(n,i);
-    //     ll b = cb.combination1(n-1,i-1);
-    //     ll tmp = mod_mul(a,b,MOD);
-    //     ans = mod_add(ans,tmp,MOD);
-    // }
-    // ans = mod_mul(ans,2,MOD);
-    // ans = mod_sub(ans,n,MOD);
-    cout << ans << nline;
+    cin >> a >> b >> c;
+    ll mx = max(a, max(b, c));
+    Combinatoric cb(mx);
+    ll res = 1;
+    res = mod_mul(res,compute(a,b,cb),mod);
+    res = mod_mul(res,compute(b,c,cb),mod);
+    res = mod_mul(res,compute(a,c,cb),mod);
+    cout << res << nline;
 }
 
 int main() {
