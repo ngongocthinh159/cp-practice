@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1284/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,14 +87,78 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
-void pre_compute() {
+struct Combinatoric {
+    ll mxN;
+    vector<ll> fact;
+    vector<ll> ifact;
+    int mod = 1e9 + 7;
+    Combinatoric(ll mxN, int mod) {
+        this->mxN = mxN;
+        this->mod = mod;
+        fact.resize(mxN+1);
+        ifact.resize(mxN+1);
+        pre_compute();
+    }
+    // O(n): pre_compute factorial and inverse factorial of mxN
+    void pre_compute() {
+        fact[0] = 1;
+        for (ll i = 1; i <= this->mxN; i++) {
+            fact[i] = mod_mul(i, fact[i-1], this->mod);
+        }
+        ifact[this->mxN] = mminvprime(fact[this->mxN], this->mod);
+        for (ll i = this->mxN - 1; i >= 0; i--) {
+            ifact[i] = mod_mul(ifact[i + 1], i + 1, this->mod);
+        }
+    }
+    vector<ll> &getFactArray() {
+        return this->fact;
+    }
+    vector<ll> &getIFactArray() {
+        return this->ifact;
+    }
 
+    // C(n,r): number of ways to choose r items among n unique items
+    // require: pre_compute of fact[mxN] and ifact[mxN] (factorial and inverse factorial)
+    // require: r <= n 
+    // O(1)
+    ll combination1(ll n, ll r) {
+        assert(n <= this->mxN);
+        assert(r <= n);
+
+        return mod_mul(fact[n], mod_mul(ifact[r], ifact[n - r], this->mod), this->mod);
+    }
+};
+// C(n,r): in O(r + log(mod)) each time
+// Use when call C(n,r) a few times or n is to large (r is still acceptable)
+ll combination_Or(ll n, ll r, ll mod) {
+    assert(r <= n);
+
+    ll numerator = 1;
+    ll denominator = 1;
+    for (ll i = n; i >= n - r + 1; i--) {
+        numerator = mod_mul(numerator, i, mod);
+    }
+    for (ll i = 1; i <= r; i++) {
+        denominator = mod_mul(denominator, i, mod);
+    }
+    ll i_denominator = mminvprime(denominator, mod);
+    return mod_mul(numerator, i_denominator, mod);
 }
 
 
-
+ll n,m;
 void solve() {
-
+    cin >> n >> m;
+    ll ans = 0;
+    Combinatoric cb(n, m);
+    for (ll len = 1; len <= n; len++) {
+        ll windows = n - len + 1;
+        ll tmp = mod_mul(windows,windows,m);
+        tmp = mod_mul(tmp,cb.getFactArray()[n-len],m);
+        tmp = mod_mul(tmp,cb.getFactArray()[len],m);
+        ans = mod_add(ans,tmp,m);
+    }
+    cout << ans << nline;
 }
 
 int main() {
@@ -108,7 +172,6 @@ int main() {
 #ifdef ThinhNgo_use_cases
     cin >> T;
 #endif
-    pre_compute();
     while (T--) {
         solve();
     }

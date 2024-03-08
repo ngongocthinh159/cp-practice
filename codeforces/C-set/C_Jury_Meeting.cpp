@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1569/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -85,16 +85,107 @@ ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprim
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
+
+struct Combinatoric {
+    ll mxN;
+    vector<ll> fact;
+    vector<ll> ifact;
+    int mod = 1e9 + 7;
+    Combinatoric(ll mxN, int mod) {
+        this->mxN = mxN;
+        this->mod = mod;
+        fact.resize(mxN+1);
+        ifact.resize(mxN+1);
+        pre_compute();
+    }
+    // O(n): pre_compute factorial and inverse factorial of mxN
+    void pre_compute() {
+        fact[0] = 1;
+        for (ll i = 1; i <= this->mxN; i++) {
+            fact[i] = mod_mul(i, fact[i-1], this->mod);
+        }
+        ifact[this->mxN] = mminvprime(fact[this->mxN], this->mod);
+        for (ll i = this->mxN - 1; i >= 0; i--) {
+            ifact[i] = mod_mul(ifact[i + 1], i + 1, this->mod);
+        }
+    }
+    vector<ll> &getFactArray() {
+        return this->fact;
+    }
+    vector<ll> &getIFactArray() {
+        return this->ifact;
+    }
+
+    // C(n,r): number of ways to choose r items among n unique items
+    // require: pre_compute of fact[mxN] and ifact[mxN] (factorial and inverse factorial)
+    // require: r <= n 
+    // O(1)
+    ll combination1(ll n, ll r) {
+        assert(n <= this->mxN);
+        assert(r <= n);
+
+        return mod_mul(fact[n], mod_mul(ifact[r], ifact[n - r], this->mod), this->mod);
+    }
+};
+// C(n,r): in O(r + log(mod)) each time
+// Use when call C(n,r) a few times or n is to large (r is still acceptable)
+ll combination_Or(ll n, ll r, ll mod) {
+    assert(r <= n);
+
+    ll numerator = 1;
+    ll denominator = 1;
+    for (ll i = n; i >= n - r + 1; i--) {
+        numerator = mod_mul(numerator, i, mod);
+    }
+    for (ll i = 1; i <= r; i++) {
+        denominator = mod_mul(denominator, i, mod);
+    }
+    ll i_denominator = mminvprime(denominator, mod);
+    return mod_mul(numerator, i_denominator, mod);
+}
+
 
 void pre_compute() {
 
 }
 
-
-
+const int mod = 998244353;
+const int mxN = 2e5 + 5;
+ll n;
+ll a[mxN];
+Combinatoric cb(mxN, mod);
 void solve() {
-
+    cin >> n;
+    ll largest = INT_MIN, second_largest = INT_MIN;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        if (largest < a[i]) {
+            second_largest = largest;
+            largest = a[i];
+        } else if (second_largest < a[i]) {
+            second_largest = a[i];
+        }
+    }
+    ll cnt = 0;
+    vector<ll> v;
+    for (int i = 0; i < n; i++) {
+        if (a[i] == largest) cnt++; 
+        if (a[i] < largest - 1) v.push_back(a[i]);
+    }
+    if (cnt >= 2) {cout << cb.getFactArray()[n] << nline; return;}
+    else if (second_largest < largest - 1) {cout << 0 << nline; return;}
+    else {
+        ll ans = cb.getFactArray()[n];
+        ll m = v.size();
+        for (int i = 0; i <= m; i++) {
+            ll tmp = cb.combination1(m,i);
+            tmp = mod_mul(tmp,cb.getFactArray()[i],mod);
+            tmp = mod_mul(tmp,cb.getFactArray()[n-1-i],mod);
+            ans = mod_sub(ans,tmp,mod);
+        }
+        cout << ans << nline;
+    }
 }
 
 int main() {
