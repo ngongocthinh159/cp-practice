@@ -6,6 +6,7 @@ Repository for practicing CP.
 
 ### Folder Structure
 
+```
 .
 └── root/
     ├── atcoder
@@ -24,3 +25,4 @@ Repository for practicing CP.
     ├── template.cpp
     ├── template_leetcode.cpp
     └── template_simple.cpp
+```
