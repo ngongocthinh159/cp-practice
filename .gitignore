@@ -7,6 +7,7 @@ output.txt
 error.txt
 
 program.cpp
+program copy.cpp
 tempCodeRunnerFile.cpp
 
 A.cpp
@@ -16,4 +17,7 @@ D.cpp
 E.cpp
 F.cpp
 G.cpp
+
+
+
 
