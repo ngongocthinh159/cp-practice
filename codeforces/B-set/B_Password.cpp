@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/126/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,19 +84,116 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
-struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
-struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
+
+// Random base at each start
+int gen_base(const int before, const int after) {
+    int base = getRandomNumber(before + 1, after);
+    return base % 2 == 0 ? base - 1 : base;
+}
+
+struct PolyHash {
+    // -------- Static variables --------
+    static const int mod = (int)1e9 + 123;  // prime mod of polynomial hashing
+    static vector<int> pow1;                // powers of base modulo mod
+    static vector<ull> pow2;                // powers of base modulo 2^64
+    static int base;                        // base (point of hashing)
+
+    // --------- Static functons --------
+    static inline int diff(int a, int b) {
+        // Diff between `a` and `b` modulo mod (0 <= a < mod, 0 <= b < mod)
+        return (a -= b) < 0 ? a + mod : a;
+    }
+
+    // -------------- Variables of class -------------
+    vector<int> pref1;  // Hash on prefix modulo mod
+    vector<ull> pref2;  // Hash on prefix modulo 2^64
+
+    // Cunstructor from string:
+    PolyHash(const string& s) {
+        assert(base < mod);
+        const int n = s.size();  // Firstly calculated needed power of base:
+        while ((int)pow1.size() <= n) {
+            pow1.push_back(1LL * pow1.back() * base % mod);
+            pow2.push_back(pow2.back() * base);
+        }
+
+        // Initilize prefix hash for each mod: pref[k] = prefix hash of first k elements
+        pref1 = vector<int>(s.size() + 1u, 0);
+        pref2 = vector<ull>(s.size() + 1u, 0);
+        for (int i = 0; i < n; ++i) {  // Fill arrays with polynomial hashes on prefix
+            assert(base > s[i]);
+            pref1[i + 1] = (pref1[i] + 1LL * s[i] * pow1[i]) % mod;
+            pref2[i + 1] = pref2[i] + s[i] * pow2[i];  // C++ auto % 2^64 for ull
+        }
+    }
+
+    // Polynomial hash of subsequence [pos, pos+len)
+    // If mxPow != 0, value automatically multiply on base in needed power. Finally base ^ mxPow
+    // pos: is index in the string
+    // mxPow: max length of all the strings, specify when call this function
+    inline pair<int, ull> operator()(const int pos, const int len, const int mxPow) const {
+        int hash1 = pref1[pos + len] - pref1[pos];
+        ull hash2 = pref2[pos + len] - pref2[pos];
+        if (hash1 < 0) hash1 += mod;
+        if (mxPow != 0) {
+            hash1 = 1LL * hash1 * pow1[mxPow - (pos + len - 1)] % mod;
+            hash2 *= pow2[mxPow - (pos + len - 1)];
+        }
+        return make_pair(hash1, hash2);
+    }
+};
+
+// Init static variables of PolyHash class:
+int PolyHash::base((int)1e9 + 7);
+vector<int> PolyHash::pow1{1};
+vector<ull> PolyHash::pow2{1};
 
 void pre_compute() {
 
 }
 
-
-
+string s;
 void solve() {
+    cin >> s;
+    int n = s.size();
+    const int mxPow = s.size(); // phai khai bao khi tinh hash, mxPow la max(s.len)
+    PolyHash::base = gen_base(256, PolyHash::base); // gen random base [256->1e9 + 7]
 
+    PolyHash hash(s);
+    int l = 0, r = n;
+    vector<int> v;
+    while (r - l > 1) {
+        int m = l + (r - l)/2;
+        bool ok = false;
+
+        int len = m;
+        auto prefixHash = hash(0, len, mxPow);
+        for (int r = len; r <= n - 2; r++) {
+            auto curHash = hash(r - len + 1, len, mxPow);
+            if (curHash == prefixHash) {
+                auto suffixHash = hash(n - len, n - 1, mxPow);
+                ok = true;
+                break;
+            }
+        }
+
+        if (ok) {
+            l = m;
+        } else {
+            r = m;
+        }
+    }
+    string ans = "Just a legend";
+    if (l != 0) {
+        for (int len = l; len >= 1; len--) {
+            auto prefixHash = hash(0, len, mxPow);
+            auto suffixHash = hash(n - len, len, mxPow);
+            if (prefixHash == suffixHash) {ans = s.substr(0, len); break;}
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

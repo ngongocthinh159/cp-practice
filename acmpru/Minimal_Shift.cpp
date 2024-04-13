@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=18&id_topic=43&id_problem=284&locale=en
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,8 +84,6 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
-struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
-struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
@@ -93,10 +91,95 @@ void pre_compute() {
 
 }
 
+// Random base at each start
+int gen_base(const int before, const int after) {
+    int base = getRandomNumber(before + 1, after);
+    return base % 2 == 0 ? base - 1 : base;
+}
+
+struct PolyHash {
+    // -------- Static variables --------
+    static const ull mod = (ull(1) << 61) - 1; // prime mod of hashing
+    static int base;                           // odd base of hashing
+    static std::vector<ull> pow;               // powers of base modulo mod;
+ 
+    // -------- Static functions --------
+    static inline ull add(ull a, ull b) {
+        // Calculate (a + b) % mod, 0 <= a < mod, 0 <= b < mod
+        return (a += b) < mod ? a : a - mod;
+    }
+ 
+    static inline ull sub(ull a, ull b) {
+        // Calculate (a - b) % mod, 0 <= a < mod, 0 <= b < mod
+        return (a -= b) < mod ? a : a + mod;
+    }
+ 
+    static inline ull mul(ull a, ull b){
+        // Calculate (a * b) % mod, 0 <= a < mod, 0 <= b < mod
+        ull l1 = (uint32_t)a, h1 = a >> 32, l2 = (uint32_t)b, h2 = b >> 32;
+        ull l = l1*l2, m = l1*h2 + l2*h1, h = h1*h2;
+        ull ret = (l & mod) + (l >> 61) + (h << 3) + (m >> 29) + (m << 35 >> 3) + 1;
+        ret = (ret & mod) + (ret >> 61);
+        ret = (ret & mod) + (ret >> 61);
+        return ret-1;
+    }
+ 
+    // -------- Variables of class --------
+    std::vector<ull> pref; // polynomial hash on prefix
+ 
+    // Constructor from string:
+    PolyHash(const std::string& s) 
+        : pref(s.size()+1u, 0) 
+    {
+        // Pre-calculate powers of base:
+        while (pow.size() <= s.size()) {
+            pow.push_back(mul(pow.back(), base));
+        }
+        // Calculate polinomial hash on prefix:
+        for (int i = 0; i < (int)s.size(); ++i) {
+            pref[i+1] = add(mul(pref[i], base), s[i]);
+        }
+    }
+ 
+    // Get hash from [pos, pos+len-1] segment of string
+    inline ull operator()(const int pos, const int len) const {
+        return sub(pref[pos+len], mul(pref[pos], pow[len]));
+    }
+ 
+};
+ 
+// Init static variables of class PolyHash:
+int PolyHash::base((int)1e9+7);
+std::vector<ull> PolyHash::pow{1};
 
 
+string s;
 void solve() {
-
+    cin >> s;
+    int n = s.size();
+    for (int i = 0; i < n - 1; i++) {
+        s += s[i];
+    }
+    PolyHash::base = gen_base(256, 2e9);
+    PolyHash hash_s(s);
+    int l = 0;
+    for (int l1 = 1; l1 < n; l1++) {
+        int lo = 0, hi = n + 1;
+        while (hi - lo > 1) {
+            int m = lo + (hi - lo)/2;
+            if (hash_s(l, m) == hash_s(l1, m)) {
+                lo = m;
+            } else
+                hi = m;
+        }
+        int idx = lo;
+        if (idx < n) {
+            if (s[l1 + idx] < s[l + idx]) {
+                l = l1;
+            }
+        }
+    }
+    cout << s.substr(l, n) << nline;
 }
 
 int main() {

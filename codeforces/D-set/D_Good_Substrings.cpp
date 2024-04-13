@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/271/problem/D
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,19 +84,141 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
-struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
-struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
-void pre_compute() {
+// Always call initialize_for_hashing() ONE time to intialize base_pow and i_base_pow arrays
+// mxPow is the max pow needed: normally is max(s.len) - 1 ( last char has base^(n-1) )
+// if not use random base then default base = 31
+const int mod1 = 1e9 + 7;
+const int mod2 = 1e9 + 9;
+ll base = 31;
+vector<ll> random_bases = {31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89};
+ll prime_count = 2;
+vector<vector<ll>> base_pow;
+vector<vector<ll>> i_base_pow;
+int gen_base() {
+    int randomIdx = getRandomNumber(0, (int) random_bases.size() - 1);
+    return random_bases[randomIdx];
+}
+// gen base and calculate basePows and iBasePows 
+void initialize_for_hashing(int mxPow, bool randomBase = true) {
+    base = gen_base();
+    int mxN = mxPow;
 
+    base_pow = vector<vector<ll>>(prime_count, vector<ll>(mxN + 1));
+    i_base_pow = vector<vector<ll>>(prime_count, vector<ll>(mxN + 1));
+    
+    base_pow[0][0] = 1;
+    i_base_pow[0][0] = 1;
+    if (mxPow >= 1) i_base_pow[0][1] = expo(base, mod1 - 2, mod1);
+
+    base_pow[1][0] = 1;
+    i_base_pow[1][0] = 1;
+    if (mxPow >= 1) i_base_pow[1][1] = expo(base, mod2 - 2, mod2);
+
+    for (int i = 1; i <= mxN; i++) {
+        base_pow[0][i] = (base_pow[0][i - 1] * base) % mod1;
+        if (i >= 2) i_base_pow[0][i] = (i_base_pow[0][i - 1] * i_base_pow[0][1]) % mod1;
+
+        base_pow[1][i] = (base_pow[1][i - 1] * base) % mod2;
+        if (i >= 2) i_base_pow[1][i] = (i_base_pow[1][i - 1] * i_base_pow[1][1]) % mod2;
+    }
+}
+struct SH {
+    ll n;
+    string s;
+    vector<ll> prefix_hash_1;
+    vector<ll> prefix_hash_2;
+    
+    SH(string queryString) {
+        // Generate prefix hash for current SH        
+        s = queryString;
+        n = s.size();
+        prefix_hash_1.resize(n + 1);
+        prefix_hash_2.resize(n + 1);
+        
+        for (int i = 1; i <= n; i++) {
+            ll mapped_num = s[i - 1] - 'a' + 1; // 1-based index
+            assert(mapped_num < base);
+
+            // Prefix hash for mod1
+            prefix_hash_1[i] = (prefix_hash_1[i - 1] + ((mapped_num*base_pow[0][i - 1]) % mod1)) % mod1;
+            
+            // Prefix hash for mod2
+            prefix_hash_2[i] = (prefix_hash_2[i - 1] + ((mapped_num*base_pow[1][i - 1]) % mod2)) % mod2;
+        }
+    }
+
+    // O(1)
+    // Base 0: Calculate hash of a range
+    inline pair<ll, ll> hash_in_range(const int l, const int r) const {
+        pair<ll, ll> res;
+        
+        // Hash of range [l, r] for mod1
+        ll hash1 = (prefix_hash_1[r + 1] - prefix_hash_1[l]) % mod1;
+        if (hash1 < 0) hash1 = (hash1 + mod1) % mod1;
+        hash1 = (hash1 * i_base_pow[0][l]) % mod1;
+        res.first = hash1;
+
+        // Hash of range [l, r] for mod2
+        ll hash2 = (prefix_hash_2[r + 1] - prefix_hash_2[l]) % mod2;
+        if (hash2 < 0) hash2 = (hash2 + mod2) % mod2;
+        hash2 = (hash2 * i_base_pow[1][l]) % mod2;
+        res.second = hash2;
+
+        return res;
+    }
+
+    inline pair<ll, ll> operator() (const int l, const int r) const {
+        return hash_in_range(l, r);
+    }
+};
+// O(1)
+// sh2 must be a SH object of the reversed string
+bool is_palindrome(ll l, ll r, SH &sh1, SH &sh2) {
+    ll size = sh1.s.size();
+    ll l2 = size - (r + 1);
+    ll r2 = size - (l + 1);
+    return sh1.hash_in_range(l, r) == sh2.hash_in_range(l2, r2);
+}
+
+void pre_compute() {
+    int mxStringSize = 1e5 + 5;
+    initialize_for_hashing(mxStringSize, false);
 }
 
 
-
+string s, isGood;
+int k;
 void solve() {
+    cin >> s >> isGood >> k;
+    SH hashS(s);
+    int n = s.size();
+    int l = 0, r = 0;
+    int bad = 0;
+    vector<pair<ll, ll>> v;
+    while (r < n) {
+        if (isGood[s[r] - 'a'] == '0') bad++;
 
+        while (l <= r && bad > k) {
+            if (isGood[s[l] - 'a'] == '0') bad--;
+            l++;
+        }
+
+        // valid window
+        for (int i = l; i <= r; i++) {
+            v.push_back(hashS(i, r));
+        }
+
+        r++;
+    }
+    sort(all(v));
+    ll ans = 0;
+    for (int i = 0; i < v.size(); i++) {
+        if (i == 0 || v[i].ff != v[i - 1].ff || v[i].ss != v[i - 1].ss) ans++;
+    }
+    cout << ans << nline;
 }
 
 int main() {
@@ -111,6 +233,7 @@ int main() {
     cin >> T;
 #endif
     pre_compute();
+    
     while (T--) {
         solve();
     }

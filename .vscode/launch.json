@@ -9,7 +9,7 @@
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
-        "externalConsole": true, //set false to see output in integrated terminal
+        "externalConsole": false, //set false to see output in integrated terminal
         "MIMode": "gdb",
         "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe",
         "setupCommands": [{
