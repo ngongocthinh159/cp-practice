@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1955/problem/E
+ * Solution for: https://codeforces.com/contest/1956/problem/A
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,6 +84,8 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
+struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 #define ThinhNgo_use_cases
 
@@ -92,30 +94,31 @@ void pre_compute() {
 }
 
 
-int n;
-string s;
+const int mxN = 1e2 + 5;
+int k, q;
+int a[mxN];
 void solve() {
-    cin >> n >> s;
-    for (int len = n; len >= 1; len--) {
-        string t = s;
-        vector<int> end(n + 1);
-        int cnt = 0;
-        for (int i = 0; i < n; i++) {
-            cnt -= end[i];
-            t[i] ^= (cnt&1);
-            if (t[i] == '0') {
-                if (i + len - 1 <= n - 1) {
-                    t[i] = '1';
-                    cnt++;
-                    end[i + len]++;
-                } else break;
+    cin >> k >> q;
+    for (int i = 0; i < k; i++) {
+        cin >> a[i];
+    }
+    for (int i = 0; i < q; i++) {
+        int n; cin >> n;
+        ll orgN = n;
+        ll ans = 0;
+        for (int i = k - 1; i >= 0 && n >= a[0]; i--) {
+            double tmp = 1.00*(n - a[i])/(i + 1);
+            if (tmp < 0) continue;
+            else {
+                int x = tmp + 1;
+                // cout << x << nline;
+                n -= x*(i + 1);
+                ans = ans + x*(i + 1);
             }
         }
-        if (*min_element(all(t)) == '1') {
-            cout << len << nline;
-            return;
-        }
+        cout << (orgN - ans) << " ";
     }
+    cout << nline;
 }
 
 int main() {

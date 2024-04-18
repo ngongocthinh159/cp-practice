@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1955/problem/E
+ * Solution for: https://vjudge.net/problem/UVA-11492
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,37 +84,106 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
+struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-#define ThinhNgo_use_cases
+// #define ThinhNgo_use_cases
 
 void pre_compute() {
 
 }
 
+struct Edge1 {
+    int uId;
+    int vId;
+    char firstC;
+    int len;
+    Edge1(int uId, int vId, char firstC, int len) {
+        this->uId = uId;
+        this->vId = vId;
+        this-> firstC = firstC;
+        this->len = len;
+    }
+};
 
-int n;
-string s;
-void solve() {
-    cin >> n >> s;
-    for (int len = n; len >= 1; len--) {
-        string t = s;
-        vector<int> end(n + 1);
-        int cnt = 0;
-        for (int i = 0; i < n; i++) {
-            cnt -= end[i];
-            t[i] ^= (cnt&1);
-            if (t[i] == '0') {
-                if (i + len - 1 <= n - 1) {
-                    t[i] = '1';
-                    cnt++;
-                    end[i + len]++;
-                } else break;
+struct Edge {
+    int vId;
+    int firstC;
+    int len;
+    Edge(int vId, char firstC, int len) {
+        this->vId = vId;
+        this-> firstC = firstC;
+        this->len = len;
+    }
+};
+
+struct compare {
+    bool operator() (const vector<ll> &v1, const vector<ll> &v2) {
+        return v2[2] < v1[2];
+    }
+};
+
+int m;
+string src, dest;
+ll dijkstra(vector<vector<Edge>> &g, int langCnt, int src, int dest) {
+    if (src == dest) return 0;
+    vector<vector<ll>> dist(langCnt, vector<ll>(26 + 1, LONG_LONG_MAX));
+    priority_queue<vector<ll>, vector<vector<ll>>, compare> pq;
+    pq.push({src, 26, 0});
+    dist[src][26] = 0;
+    while (pq.size()) {
+        auto cur = pq.top(); pq.pop();
+        int u = cur[0];
+        int lastC = cur[1];
+        int w_u = cur[2];
+        for (auto &edge: g[u]) {
+            int v = edge.vId;
+            int edge_firstC = edge.firstC;
+            int w_uv = edge.len;
+            if (lastC != edge_firstC) {
+                if (dist[v][edge_firstC] > w_u + w_uv) {
+                    dist[v][edge_firstC] = w_u + w_uv;
+                    pq.push({v, edge_firstC, dist[v][edge_firstC]});
+                }
             }
         }
-        if (*min_element(all(t)) == '1') {
-            cout << len << nline;
-            return;
+    }
+    ll ans = LONG_LONG_MAX;
+    for (int j = 0; j < 26; j++) {
+        ans = min(ans, dist[dest][j]);
+    }
+    return ans;
+}
+void solve() {
+    while (true) {
+        cin >> m;
+        if (m==0) return;
+        cin >> src >> dest;
+        unordered_map<string,int> langToId;
+        int id = 0;
+        langToId[src] = id++;
+        if (src != dest) langToId[dest] = id++;
+        vector<Edge1> edges;
+        for (int i = 0; i < m; i++) {
+            string u, v, word; cin >> u >> v >> word;
+            if (!langToId.count(u)) langToId[u] = id++;
+            if (!langToId.count(v)) langToId[v] = id++;
+            int uId = langToId[u];
+            int vId = langToId[v];
+            edges.push_back(Edge1(uId, vId, word[0] - 'a', (int) word.size()));
         }
+        int langCnt = langToId.size();
+        vector<vector<Edge>> g(langCnt);
+        for (auto &edge : edges) {
+            int uid = edge.uId;
+            int vid = edge.vId;
+            int firstC = edge.firstC;
+            int len = edge.len;
+            g[uid].push_back(Edge(vid, firstC, len));
+            g[vid].push_back(Edge(uid, firstC, len));
+        }
+        ll res = dijkstra(g, langCnt, langToId[src], langToId[dest]);
+        cout << (res == LONG_LONG_MAX ? "impossivel" : to_string(res)) << nline;
     }
 }
 

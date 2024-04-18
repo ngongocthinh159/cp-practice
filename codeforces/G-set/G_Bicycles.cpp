@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1955/problem/E
+ * Solution for: https://codeforces.com/contest/1915/problem/G
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,6 +84,8 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
+struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 #define ThinhNgo_use_cases
 
@@ -91,31 +93,53 @@ void pre_compute() {
 
 }
 
-
-int n;
-string s;
-void solve() {
-    cin >> n >> s;
-    for (int len = n; len >= 1; len--) {
-        string t = s;
-        vector<int> end(n + 1);
-        int cnt = 0;
-        for (int i = 0; i < n; i++) {
-            cnt -= end[i];
-            t[i] ^= (cnt&1);
-            if (t[i] == '0') {
-                if (i + len - 1 <= n - 1) {
-                    t[i] = '1';
-                    cnt++;
-                    end[i + len]++;
-                } else break;
+struct compare {
+    bool operator() (const vector<ll> &v1, const vector<ll> &v2) {
+        return v2[2] < v1[2];
+    }
+};
+int n, m, s;
+ll dijkstra(int src, int dest, vector<unordered_map<int, int>>& g, vector<int> &s, int mxS) {
+    vector<vector<ll>> dist(n + 1, vector<ll>(mxS + 1, LONG_LONG_MAX));
+    dist[src][s[0]] = 0;
+    priority_queue<vector<ll>, vector<vector<ll>>, compare> pq;
+    pq.push({src, s[src], 0});
+    while (pq.size()) {
+        auto cur = pq.top(); pq.pop();
+        ll u = cur[0];
+        ll su = cur[1];
+        ll w_u = cur[2];
+        for (auto &[v, w_uv] : g[u]) {
+            ll newS = min(1LL*s[v], su);
+            if (dist[v][newS] > w_u + 1LL*w_uv*su) {
+                dist[v][newS] = w_u + 1LL*w_uv*su;
+                pq.push({v, newS, dist[v][newS]});
             }
         }
-        if (*min_element(all(t)) == '1') {
-            cout << len << nline;
-            return;
-        }
     }
+    ll ans = LONG_LONG_MAX;
+    for (int i = 1; i <= mxS; i++) {
+        ans = min(ans, dist[dest][i]);
+    }
+    return ans;
+}
+void solve() {
+    cin >> n >> m;
+    vector<unordered_map<int, int>> g(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        int _w1 = g[u].count(v) ? g[u][v] : INT_MAX;
+        int _w2 = g[v].count(u) ? g[v][u] : INT_MAX;
+        g[u][v] = g[v][u] = min(w, min(_w1, _w2));
+    }
+    vector<int> s(n+1);
+    int mxS = INT_MIN;
+    for (int u = 1; u <= n; u++) {
+        cin >> s[u];
+        mxS = max(mxS, s[u]);
+    }
+    cout << dijkstra(1, n, g, s, mxS) << nline;
 }
 
 int main() {

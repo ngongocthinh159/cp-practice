@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1955/problem/E
+ * Solution for: https://vjudge.net/problem/UVA-10269
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,6 +84,8 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
+struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 #define ThinhNgo_use_cases
 
@@ -91,31 +93,76 @@ void pre_compute() {
 
 }
 
+struct compare {
+    bool operator() (const vector<ll>& v1, const vector<ll> &v2) const {
+        return v2[3] < v1[3];
+    }
+};
+ll a, b, m, l, k;
+ll dijkstra(vector<vector<pair<ll,ll>>> &g) {
+    vector<vector<vector<ll>>> dist((a+b+1), vector<vector<ll>>(l + 1, vector<ll>(k + 1, LONG_LONG_MAX)));
+    priority_queue<vector<ll>, vector<vector<ll>>, compare> pq;
+    int src = a+b;
+    int dest = 1;
+    pq.push({src,0,k,0});
+    while (pq.size()) {
+        auto cur = pq.top(); pq.pop();
+        ll u = cur[0];
+        ll l_u = cur[1];
+        ll k_u = cur[2];
+        ll w_u = cur[3];
+        vector<pair<ll,ll>> can_skips;
+        for (auto &p : g[u]) {
+            ll v = p.ff;
+            ll w_uv = p.ss;
+            bool skipUsingPrevL = false;
+            if (l_u >= w_uv || (k_u > 0 && l >= w_uv)) {
+                // skip using prev l
+                if (l_u >= w_uv) {
+                    int next_l_u = v <= a ? l_u - w_uv : 0;
+                    if (dist[v][next_l_u][k_u] > w_u) {
+                        dist[v][next_l_u][k_u] = w_u;
+                        pq.push({v,next_l_u,k_u,w_u});
+                    }
+                    skipUsingPrevL = true;
 
-int n;
-string s;
-void solve() {
-    cin >> n >> s;
-    for (int len = n; len >= 1; len--) {
-        string t = s;
-        vector<int> end(n + 1);
-        int cnt = 0;
-        for (int i = 0; i < n; i++) {
-            cnt -= end[i];
-            t[i] ^= (cnt&1);
-            if (t[i] == '0') {
-                if (i + len - 1 <= n - 1) {
-                    t[i] = '1';
-                    cnt++;
-                    end[i + len]++;
-                } else break;
+                // skip using k
+                } else {
+                    int next_l_u = v <= a ? l - w_uv : 0;
+                    if (dist[v][next_l_u][k_u - 1] > w_u) {
+                        dist[v][next_l_u][k_u - 1] = w_u;
+                        pq.push({v,next_l_u,k_u-1,w_u});
+                    }
+                }
+            }
+            if (!skipUsingPrevL) {
+                // not skip
+                if (dist[v][0][k_u] > w_u + w_uv) {
+                    dist[v][0][k_u] = w_u + w_uv;
+                    pq.push({v,0,k_u,dist[v][0][k_u]});
+                }
             }
         }
-        if (*min_element(all(t)) == '1') {
-            cout << len << nline;
-            return;
+    }
+    ll ans = LONG_LONG_MAX;
+    for (int i = 0; i <= l; i++) {
+        for (int j = 0; j <= k; j++) {
+            ans = min(ans, dist[dest][i][j]);
         }
     }
+    return ans;
+}
+void solve() {
+    cin >> a >> b >> m >> l >> k;
+    vector<vector<pair<ll,ll>>> g(a + b + 1);
+    for (int i = 0; i < m; i++) {
+        ll x, y, l1;
+        cin >> x >> y >> l1;
+        g[x].push_back({y,l1});
+        g[y].push_back({x,l1});
+    }
+    cout << dijkstra(g) << nline;
+    // cout << "here\n";
 }
 
 int main() {
