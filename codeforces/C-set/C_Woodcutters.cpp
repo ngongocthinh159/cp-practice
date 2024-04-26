@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1338/problem/A
+ * Solution for: https://codeforces.com/problemset/problem/545/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,28 +87,46 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-#define ThinhNgo_use_cases
+// #define ThinhNgo_use_cases
 
-void pre_compute() {}
+void pre_compute() {
+
+}
+
+
 
 const int mxN = 1e5 + 5;
 int n;
-int a[mxN];
+int l[mxN];
+int r[mxN];
+int stay[mxN];
+int x[mxN];
+int h[mxN];
 void solve() {
     cin >> n;
-    ll ans = 0;
-    cin >> a[0];
-    for (int i = 1; i < n;i++) {
-        cin >> a[i];
-        if (a[i] < a[i - 1]) {
-            ll dif = a[i - 1] - a[i];
-            ll pow = __lg(dif);
-            a[i] = a[i - 1];
-            ans = max(ans, pow + 1);
-        }
+    for (int i = 0; i < n; i++) {
+        cin >> x[i] >> h[i];
+        l[i] = r[i] = stay[i] = INT_MIN;
     }
-    cout << ans << nline;
+    stay[0] = 0;
+    l[0] = 1;
+    r[0] = 1;
+    for (int i = 1; i < n; i++) {
+        stay[i] = max(stay[i - 1], l[i - 1]);
+        if (x[i - 1] + h[i - 1] < x[i]) stay[i] = max(stay[i], r[i - 1]);
 
+        if (x[i] - h[i] > x[i - 1]) {
+            l[i] = 1 + max(stay[i - 1], l[i - 1]);
+            if (x[i] - h[i] > x[i - 1] + h[i - 1]) {
+                l[i] = max(l[i], 1 + r[i - 1]);
+            }
+        }
+        
+        r[i] = 1 + max(stay[i - 1], l[i - 1]);
+        if (x[i - 1] + h[i - 1] < x[i]) r[i] = max(r[i], 1 + r[i - 1]);
+    }
+    int ans = max(l[n - 1], max(r[n - 1], stay[n - 1]));
+    cout << ans << nline;
 }
 
 int main() {

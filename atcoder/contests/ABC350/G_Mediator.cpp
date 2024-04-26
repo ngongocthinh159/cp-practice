@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1338/problem/A
+ * Solution for: https://atcoder.jp/contests/abc350/tasks/abc350_g
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,28 +87,90 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-#define ThinhNgo_use_cases
+// #define ThinhNgo_use_cases
 
-void pre_compute() {}
+void pre_compute() {
 
-const int mxN = 1e5 + 5;
-int n;
-int a[mxN];
-void solve() {
-    cin >> n;
-    ll ans = 0;
-    cin >> a[0];
-    for (int i = 1; i < n;i++) {
-        cin >> a[i];
-        if (a[i] < a[i - 1]) {
-            ll dif = a[i - 1] - a[i];
-            ll pow = __lg(dif);
-            a[i] = a[i - 1];
-            ans = max(ans, pow + 1);
+}
+
+int n, q;
+const int m = 998244353;
+vector<int> par;
+vector<vector<int>> g;
+struct DSU {
+    vector<int> parent;
+    vector<int> size;
+    DSU(int n) {
+        parent.resize(n);
+        size.resize(n);
+    }
+    void make_set(int x) {
+        parent[x] = x;
+        size[x] = 1;
+    }
+    int find(int x) {
+        if (parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+    void unite(int a, int b) {
+        int pa = find(a);
+        int pb = find(b);
+        if (pa != pb) {
+            if (size[pa] < size[pb])
+                swap(pa, pb);
+            size[pa] += size[pb];
+            parent[pb] = pa;
         }
     }
-    cout << ans << nline;
+    void update(int u, int parent) {
+        par[u] = parent;
+        for (auto &v : g[u]) {
+            if (v != parent) {
+                update(v, u);
+            }
+        }
+    }
+    void join_sub_tree(int u, int v) {
+        if (size[find(u)] < size[find(v)])
+            swap(u, v);
+        unite(u, v);
+        update(v, u);
+    }
+};
 
+
+void solve() {
+    cin >> n >> q;
+    g = vector<vector<int>>(n + 1);
+    par = vector<int>(n + 1, -1);
+    int x_prev = 0;
+    DSU dsu(n + 1);
+    for (int i = 1; i <= n; i++) {
+        dsu.make_set(i);
+    }
+    for (int i = 1; i <= q; i++) {
+        int a, b, c; cin >> a >> b >> c;
+        int type, u, v;
+        type = 1 + (((1LL*a*(1 + x_prev)) % m) % 2);
+        u = 1 + (((1LL*b*(1 + x_prev)) % m) % n);
+        v = 1 + (((1LL*c*(1 + x_prev)) % m) % n);
+
+        if (type == 1) {
+            g[u].push_back(v);
+            g[v].push_back(u);
+            dsu.join_sub_tree(u, v);
+        } else {
+            int x = 0;
+            int par_u = par[u];
+            int par_v = par[v];
+            if (par_u != -1 && par_v != -1 && par_u == par_v) x = par_u;
+            else if (par_u != -1 && par[par_u] == v) x = par_u;
+            else if (par_v != -1 && par[par_v] == u) x = par_v;
+            x_prev = x;
+
+            cout << x << nline;
+        }
+    }
 }
 
 int main() {

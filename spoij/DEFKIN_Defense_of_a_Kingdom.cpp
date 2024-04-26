@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/1338/problem/A
+ * Solution for: https://www.spoj.com/problems/DEFKIN/
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -89,27 +89,52 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 /*--------------------------------------------------------------------------------------------------------------------------*/
 #define ThinhNgo_use_cases
 
-void pre_compute() {}
-
-const int mxN = 1e5 + 5;
-int n;
-int a[mxN];
-void solve() {
-    cin >> n;
-    ll ans = 0;
-    cin >> a[0];
-    for (int i = 1; i < n;i++) {
-        cin >> a[i];
-        if (a[i] < a[i - 1]) {
-            ll dif = a[i - 1] - a[i];
-            ll pow = __lg(dif);
-            a[i] = a[i - 1];
-            ans = max(ans, pow + 1);
-        }
-    }
-    cout << ans << nline;
+void pre_compute() {
 
 }
+
+
+int m, n, t;
+void solve() {
+    cin >> m >> n >> t;
+    vector<int> row;
+    vector<int> col;
+    for (int i = 0; i < t; i++) {
+        int x, y; cin >> x >> y;
+        x--; y--;
+        swap(x,y);
+        row.push_back(x);
+        col.push_back(y);
+    }
+    row.push_back(-1);
+    row.push_back(n);
+    col.push_back(-1);
+    col.push_back(m);
+    
+    
+    int mxCol = INT_MIN, mxRow = INT_MIN;
+    sort(all(row));
+    sort(all(col));
+    // for (auto x : row) {
+    //     cout << x << " ";
+    // }
+
+    // cout << nline;
+    // for (auto x : col) {
+    //     cout << x << " ";
+    // }
+    // cout << nline;
+    for (int i = 1; i < col.size(); i++) {
+        mxCol = max(mxCol, col[i] - col[i - 1] - 1);
+    }
+    for (int i = 1; i < row.size(); i++) {
+        mxRow = max(mxRow, row[i] - row[i - 1] - 1);
+    }
+    // cout << mxCol << " " << mxRow << nline;
+    cout << 1LL * mxCol * mxRow << nline;
+}
+
+
 
 int main() {
 #ifdef ThinhNgo
