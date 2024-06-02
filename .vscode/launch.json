@@ -17,6 +17,6 @@
             "text": "-enable-pretty-printing",
             "ignoreFailures": true
         }],
-        "preLaunchTask": "C/C++: g++.exe build active file"
+        "preLaunchTask": "[ThinhNgo] C/C++: g++.exe build active file"
     }]
 }
