@@ -7,27 +7,28 @@
             "args": [
                 "-fdiagnostics-color=always",
                 
-                "-Wall",
-                "-Wextra",
-                "-pedantic",
-                "-std=c++11",
-                "-O2",
-                "-Wshadow",
-                "-Wformat=2",
-                "-Wfloat-equal",
-                // "-Wconversion",
-                "-Wlogical-op",
-                "-Wshift-overflow=2",
-                "-Wduplicated-cond",
+                "-LC:/mingw64/x86_64-w64-mingw32/bin",
+                "-Wall", // enable compiler warnings
+                "-Wextra", // enable compiler warnings
+                "-pedantic", // enable compiler warnings
+                "-std=c++17",
+                "-O2", // code optimization
+                "-Wshadow", // warns if a declared name shadows the same name in some outer level
+                "-Wformat=2", // warns if an argument type in printf()/scanf() does not correspond to the format string
+                "-Wfloat-equal", // disable comparing floats directly, use fabs(a - b) < eps
+                // "-Wconversion", // disable implicit type cast
+                "-Wlogical-op", // warns about logical operators in places where GCC expects bitwise operators
+                "-Wshift-overflow=2", // warns about left shift overflows
+                "-Wduplicated-cond", // warns about repeated conditions in if (…) else if (…)
                 "-Wcast-qual",
                 "-Wcast-align",
-                "-D_GLIBCXX_DEBUG",
-                "-D_GLIBCXX_DEBUG_PEDANTIC",
-                "-D_FORTIFY_SOURCE=2",
-                // "-fsanitize=address",
-                // "-fsanitize=undefined",
-                "-fno-sanitize-recover",
-                "-fstack-protector",
+                "-D_GLIBCXX_DEBUG", // out of bound warning
+                "-D_GLIBCXX_DEBUG_PEDANTIC", // out of bound warning
+                "-D_FORTIFY_SOURCE=2", // inserts security checks, such as checks for buffer overflows
+                // "-fsanitize=address", //not supported in windows
+                // "-fsanitize=undefined", //not supported in windows
+                // "-fno-sanitize-recover", //not supported in windows
+                // "-fstack-protector", //not supported in windows
 
                 "${file}",
                 "-o",
