@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/gym/103373/problem/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,16 +87,25 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
-
+const int mxn = 1e6 + 5;
+long long sum_divisors[mxn + 1];
+int n;
 void pre_compute() {
-
+    for (int i = 1; i <= mxn; i++) {
+        for (int j = i; j <= mxn; j += i) {
+            sum_divisors[j] += i;
+        }
+    }
 }
 void solve() {
-
+    cin >> n;
+    if (sum_divisors[n] - n > n) cout << "abundant" << nline;
+    else if (sum_divisors[n] - n < n) cout << "deficient" << nline;
+    else cout << "perfect" << nline;
 }
 
 int main() {

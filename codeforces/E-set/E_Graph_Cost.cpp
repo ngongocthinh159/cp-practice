@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/1731/problem/E 
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -87,16 +87,40 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
-
-
-
+#define ThinhNgo_use_cases
 
 void pre_compute() {
-
+    
 }
-void solve() {
 
+
+const int mxn = 1e6 + 5;
+ll n, m;
+ll dp[mxn + 1];
+void solve() {
+    cin >> n >> m;
+    ll multiples;
+    for (int i = n; i >= 1; i--) {
+        multiples = n/i;
+        dp[i] = multiples*(multiples - 1)/2;
+        for (int j = 2*i; j <= n; j += i) {
+            dp[i] -= dp[j];
+        }
+    }
+    vector<pair<int,ll>> v;
+    for (int i = n; i >= 2; i--) {
+        if (dp[i] >= i - 1) v.push_back({i, dp[i]}); 
+    }
+    ll i = 0, will_add, cost = 0, mul;
+    while (i < (int) v.size() && m > 0) {
+        mul = min(v[i].ss / (v[i].ff - 1), m / (v[i].ff - 1));
+        will_add = mul * (v[i].ff - 1);
+        m -= will_add;
+        if (mul > 0) cost += mul*v[i].ff;
+        i++;
+    }
+    if (m == 0) cout << cost << nline;
+    else cout << -1 << nline;
 }
 
 int main() {
