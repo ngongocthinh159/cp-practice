@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc358/tasks/abc358_e
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -84,116 +84,42 @@ ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) %
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
 ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
+struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
+const int mxk = 1e3 + 5;
+int k;
+int C[mxk];
+ll fact[mxk];
+ll inv_fact[mxk];
+ll dp[27][mxk]; // dp[i][j]: chi consider i ki tu dau tien, so cach de tao ra array co length j
 void pre_compute() {
-
+    fact[0] = 1;
+    for (int i = 1; i < mxk; i++) fact[i] = fact[i - 1] * i % MOD1;
+    inv_fact[mxk - 1] = expo(fact[mxk - 1], MOD1 - 2, MOD1);
+    for (int i = mxk - 2; i >= 0; i--) {
+        inv_fact[i] = inv_fact[i + 1] * (i + 1) % MOD1;
+    }
 }
-
-// Random base at each start
-int gen_base(const int before, const int after) {
-    int base = getRandomNumber(before + 1, after);
-    return base % 2 == 0 ? base - 1 : base;
+int comb(int n, int x) {
+    return (fact[n] * inv_fact[x] % MOD1) * inv_fact[n - x] % MOD1;
 }
-
-struct PolyHash {
-    // -------- Static variables --------
-    static const int mod = (int)1e9+123; // prime mod of polynomial hashing
-    static std::vector<int> pow1;        // powers of base modulo mod
-    static std::vector<ull> pow2;        // powers of base modulo 2^64
-    static int base;                     // base (point of hashing)
-    
-    // --------- Static functons --------
-    static inline int diff(int a, int b) { 
-    	// Diff between `a` and `b` modulo mod (0 <= a < mod, 0 <= b < mod)
-        return (a -= b) < 0 ? a + mod : a;
-    }
-    
-    // -------------- Variables of class -------------
-    std::vector<int> pref1; // Hash on prefix modulo mod
-    std::vector<ull> pref2; // Hash on prefix modulo 2^64
-    
-    // Cunstructor from string:
-    PolyHash(const std::string& s)
-        : pref1(s.size()+1u, 0)
-        , pref2(s.size()+1u, 0)
-    {
-        assert(base < mod);
-        const int n = s.size(); // Firstly calculated needed power of base:
-        while ((int)pow1.size() <= n) {
-            pow1.push_back(1LL * pow1.back() * base % mod);
-            pow2.push_back(pow2.back() * base);
-        }
-        for (int i = 0; i < n; ++i) { // Fill arrays with polynomial hashes on prefix
-            assert(base > s[i]);
-            pref1[i+1] = (pref1[i] + 1LL * s[i] * pow1[i]) % mod;
-            pref2[i+1] = pref2[i] + s[i] * pow2[i];
-        }
-    }
-    
-    // Polynomial hash of subsequence [pos, pos+len)
-    // If mxPow != 0, value automatically multiply on base in needed power. Finally base ^ mxPow
-    inline std::pair<int, ull> operator()(const int pos, const int len, const int mxPow = 0) const {
-        int hash1 = pref1[pos+len] - pref1[pos];
-        ull hash2 = pref2[pos+len] - pref2[pos];
-        if (hash1 < 0) hash1 += mod;
-        if (mxPow != 0) {
-            hash1 = 1LL * hash1 * pow1[mxPow-(pos+len-1)] % mod;
-            hash2 *= pow2[mxPow-(pos+len-1)];
-        }
-        return std::make_pair(hash1, hash2);
-    }
-};
-
-// Init static variables of PolyHash class:
-int PolyHash::base((int)1e9+7);    
-std::vector<int> PolyHash::pow1{1};
-std::vector<ull> PolyHash::pow2{1};
-
-bool compare(int l1, int l2, int n, string &s, PolyHash &hash_s, int mxPow) {
-    int l = 0, r = n + 1;
-    while (r - l > 1) {
-        int m = l + (r - l)/2;
-        if (hash_s(l1, m, mxPow) == hash_s(l2, m, mxPow)) {
-            l = m;
-        } else 
-            r = m;
-    }
-    int idx = l;
-    if (idx < n) {
-        if (s[l1 + idx] < s[l2 + idx]) return true;
-    }
-    return false;
-}
-
 void solve() {
-    string s;
-    cin >> s;
-    int n = s.size();
-    for (int i = 0; i < n - 1; i++) {
-        s += s[i];
+    cin >> k;
+    for (int i = 0; i < 26; i++) cin >> C[i];
+    dp[0][0] = 1;
+    for (int i = 1; i <= 26; i++) {
+        for (int j = 0; j <= k; j++) {
+            for (int p = 0; p <= min(C[i - 1], j); p++) {
+                dp[i][j] = (dp[i][j] + (dp[i - 1][j - p]*comb(j, p) % MOD1)) % MOD1;
+            }
+        }
     }
-    const int mxPow = s.size(); // phai khai bao khi tinh hash, mxPow la max(s.len)
-    PolyHash::base = gen_base(256, PolyHash::base); // gen random base [256->1e9 + 7]
-    PolyHash hash_s(s);
-    vector<int> v;
-    int largerThanOrEqual = 0;
-    for (int i = 1; i < n; i++) {
-        if (compare(0, i, n, s, hash_s, mxPow)) largerThanOrEqual++;
-    }
-    for (int i = 0; i < n; i++) {
-        v.push_back(i);
-    }
-    sort(all(v), [&](int l1, int l2) {
-        return compare(l1, l2, n, s, hash_s, mxPow);
-    });
-    string res = "";
-    for (auto idx : v) {
-        res += s[idx + n - 1];
-    }
-    cout << (n - largerThanOrEqual) << nline;
-    cout << res << nline;
+    int ans = 0;
+    for (int j = 1; j <= k; j++) ans = (ans + dp[26][j]) % MOD1;
+    cout << ans << nline;
 }
 
 int main() {
