@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/711/problem/C
+ * Solution for: https://atcoder.jp/contests/abc042/tasks/arc058_b
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -90,73 +90,40 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-const int mxn = 1e2 + 5;
-ll n, m, _k;
-ll cost[mxn][mxn];
-ll c[mxn];
-ll minColor[mxn][mxn]; // save min color of min1
-void pre_compute() {
 
+const int mxn = 1e5 + 5;
+vector<ll> fact(2*mxn + 5);
+vector<ll> ifact(2*mxn + 5);
+ll h, w, a, b;
+void pre_compute() {
+    fact[0] = 1;
+    int mx = fact.size() - 1;
+    for (int i = 0; i <= mx - 1; i++) {
+        fact[i + 1] = fact[i] * (i + 1) % MOD;
+    }
+    ifact[mx] = expo(fact[mx], MOD - 2, MOD);
+    for (int i = mx - 1; i >= 0; i--) {
+        ifact[i] = ifact[i + 1] * (i + 1) % MOD;
+    }
+}
+ll comb(ll _n, ll _r) {
+    return (fact[_n] * ifact[_r] % MOD) * ifact[_n - _r] % MOD;
+}
+ll cnt(int x, int y, int x2, int y2) {
+    ll h_s = x2 - x;
+    ll w_s = y2 - y;
+    return comb(h_s + w_s, h_s);
 }
 void solve() {
-    cin >> n >> m >> _k;
-    for (int i = 0; i < n; i++) {
-        cin >> c[i];
+    cin >> h >> w >> a >> b;
+    ll s = 0;
+    for (int j = b; j < w; j++) {
+        int i = h - a - 1;
+        ll tmp = cnt(0, 0, i, j);
+        tmp = tmp * cnt(i + 1, j, h - 1, w - 1) % MOD;
+        s = (s + tmp) % MOD;
     }
-    for (int i = 0; i < n; i++) {
-        for (int j = 1; j <= m; j++) {
-            cin >> cost[i][j];
-        }
-    }
-    vector<vector<vector<ll>>> dp(n + 1, 
-        vector<vector<ll>>(_k + 2,
-        vector<ll>(m + 1, INF)));
-    vector<vector<ll>> min1(n + 1,
-        vector<ll>(_k + 2, INF));
-    vector<vector<ll>> min2(n + 1,
-        vector<ll>(_k + 2, INF));
-    for (int j = 1; j <= m; j++) {
-        dp[n][_k][j] = 0;
-        if (min1[n][_k] > dp[n][_k][j] + cost[n - 1][j]) {
-            min2[n][_k] = min1[n][_k];
-            min1[n][_k] = dp[n][_k][j] + cost[n - 1][j];
-            minColor[n][_k] = j;
-        } else if (min2[n][_k] > dp[n][_k][j] + cost[n - 1][j]) {
-            min2[n][_k] = dp[n][_k][j] + cost[n - 1][j];
-        }
-    }
-    for (int i = n - 1; i >= 1; i--) {
-        for (int k = 0; k <= _k; k++) {
-            for (int j = 1; j <= m; j++) {
-                if (c[i] != 0) {
-                    dp[i][k][j] = dp[i + 1][c[i] != j ? k + 1 : k][c[i]];
-                } else {
-                    ll tmp = min1[i + 1][k + 1];
-                    if (minColor[i + 1][k + 1] == j) {
-                        tmp = min2[i + 1][k + 1];
-                    }
-                    if (dp[i + 1][k][j] != INF) tmp = min(tmp, cost[i][j] + dp[i + 1][k][j]);
-                    dp[i][k][j] = tmp;
-                }
-                
-                ll tmp2 = dp[i][k][j] + cost[i - 1][j];
-                if (min1[i][k] > tmp2) {
-                    min2[i][k] = min1[i][k];
-                    min1[i][k] = tmp2;
-                    minColor[i][k] = j;
-                } else if (min2[i][k] > tmp2) {
-                    min2[i][k] = tmp2;
-                }
-            }
-        }
-    }
-    if (c[0] != 0) {
-        dp[0][0][0] = dp[1][1][c[0]];
-    } else {
-        dp[0][0][0] = min1[1][1];
-    }
-    if (dp[0][0][0] == INF) cout << -1 << nline;
-    else cout << dp[0][0][0] << nline;
+    cout << s << nline;
 }
 
 int main() {
