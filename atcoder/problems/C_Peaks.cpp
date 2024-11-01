@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc166/tasks/abc166_c
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,7 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF 1e18
-#define IINF 1e9
+#define INF 1e18
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -92,12 +91,49 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-
+int n, m;
+vector<int> h;
+vector<vector<int>> g;
+vector<int> mx;
+const int MN = -1e9;
+vector<bool> visited;
 void pre_compute() {
 
 }
+void dfs(int u, int par) {
+    visited[u] = true;
+    for (auto v : g[u]) {
+        mx[u] = max(mx[u], h[v]);
+        if (v != par && !visited[v]) {
+            dfs(v, u);
+        }
+    }
+}
 void solve() {
-
+    cin >> n >> m;
+    g.resize(n + 1);
+    mx.resize(n + 1);
+    visited.resize(n + 1);
+    h.resize(n + 1);
+    fill(all(mx), MN);
+    for (int i = 1; i <= n ;i++) {
+        cin >> h[i];
+    }
+    for (int i = 0; i < m; i++) {
+        int u, v;cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) dfs(i, -1);
+    }
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        if (mx[i] < h[i]) {
+            ans++;
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

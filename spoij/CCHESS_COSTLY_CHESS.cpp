@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://www.spoj.com/problems/CCHESS/
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,8 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF 1e18
-#define IINF 1e9
+#define LINF ((int) 1e18)
+#define IINF ((int) 1e9)
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -93,11 +93,47 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
+vector<vector<int>> moves = {{1,2},{2,1},{-1,-2},{-2,-1},{-2,1},{-1,2},{2,-1},{1,-2}};
+int n = 8, m = 8;
 void pre_compute() {
 
 }
+void dijkstra(int x1, int y1, int x2, int y2) {
+    set<pair<ll,pair<int,int>>> S;
+    vector<vector<ll>> dist(n, vector<ll>(m, LINF));
+    S.insert({0, {x1, y1}});
+    dist[x1][y1] = 0;
+    int xu, yu, xv, yv;
+    ll w_u, w_uv;
+    while (S.size()) {
+        auto p = *S.begin();
+        S.erase(S.begin());
+        w_u = p.first;
+        xu = p.second.first;
+        yu = p.second.second;
+        for (auto &move : moves) {
+            xv = xu + move[0];
+            yv = yu + move[1];
+            if (0 <= xv && xv < n && 0 <= yv && yv < m) {
+                w_uv = 1LL*xv*xu + 1LL*yv*yu;
+                if (dist[xv][yv] > w_u + w_uv) {
+                    S.erase({dist[xv][yv], {xv, yv}});
+                    dist[xv][yv] = w_u + w_uv;
+                    S.insert({dist[xv][yv], {xv, yv}});
+                }
+            }
+        }
+    }
+    cout << dist[x2][y2] << nline;
+}
 void solve() {
-
+    string line;
+    int a, b, c, d;
+    while (getline(cin, line)) {
+        stringstream ss(line);
+        ss >> a >> b >> c >> d;
+        dijkstra(a, b, c, d);
+    }
 }
 
 int main() {

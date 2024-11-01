@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/1365/problem/D
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,7 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF 1e18
-#define IINF 1e9
+#define INF 1e18
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -88,16 +87,85 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
-
+int n, m;
+const int mxn = 50 + 5;
+char matrix[mxn][mxn];
+vector<vector<int>> moves = {{1,0},{0,1},{-1,0},{0,-1}};
 void pre_compute() {
 
 }
 void solve() {
-
+    cin >> n >> m;
+    int g = 0;
+    for (int i = 0; i <n ;i++) {
+        for (int j = 0; j < m; j++) {
+            cin >> matrix[i][j];
+            if (matrix[i][j] == 'G') {
+                g++;
+            }
+        }
+    }
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (matrix[i][j] == 'B') {
+                for (auto &move : moves) {
+                    int I = i + move[0];
+                    int J = j + move[1];
+                    if (0 <= I && I < n && 0 <= J && J < m) {
+                        if (matrix[I][J] == 'G') {
+                            ok = false;
+                            break;
+                        } else if (matrix[I][J] == '.') {
+                            matrix[I][J] = '#';
+                        }
+                    }
+                }
+            }
+            if (!ok) break;
+        }
+        if (!ok) break;
+    }
+    if (!ok) {
+        cout << "No" << nline;
+        return;
+    } else if (matrix[n - 1][m - 1] == '#') {
+        if (g > 0) cout << "No" << nline;
+        else cout << "Yes" << nline;
+        return;
+    }
+    // for (int i = 0 ;i < n; i++) {
+    //     for (int j = 0; j<m; j++) {
+    //         cout << matrix[i][j];
+    //     }
+    //     cout << nline;
+    // }
+    deque<pair<int,int>> q;
+    q.push_front({n - 1, m - 1});
+    vector<vector<bool>> visited(n, vector<bool>(m));
+    visited[n - 1][m - 1] = true;
+    while (q.size()) {
+        int size = q.size();
+        for (int i = 0; i< size; i++) {
+            auto p = q.back(); q.pop_back();
+            if (matrix[p.first][p.second] == 'G') g--;
+            for (auto & move: moves) {
+                int I = p.first + move[0];
+                int J = p.second + move[1];
+                
+                if (0 <= I && I < n && 0 <= J && J < m && !visited[I][J] && matrix[I][J] != '#') {
+                    visited[I][J] = true;
+                    q.push_front({I, J});
+                }
+            }
+        }
+    }
+    if (g == 0) cout << "Yes" << nline;
+    else cout << "No" << nline;
 }
 
 int main() {

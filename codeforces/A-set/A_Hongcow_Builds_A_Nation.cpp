@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/744/A
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,7 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF 1e18
-#define IINF 1e9
+#define INF 1e18
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -93,11 +92,67 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
+int n, m, k;
+vector<vector<int>> g;
+vector<bool> visited;
 void pre_compute() {
 
 }
+void dfs(int u, int par, int &edges, int &vertices) {
+    vertices++;
+    visited[u] = true;
+    for (auto v : g[u]) {
+        edges++;
+        if (v != par && !visited[v]) {
+            dfs(v, u, edges, vertices);
+        }
+     }
+}
 void solve() {
-
+    cin >> n >> m >> k;
+    g.resize(n + 1);
+    visited.resize(n + 1);
+    vector<int> v(k);
+    for (int i = 0; i < k; i++) {
+        cin >> v[i];
+    }
+    for (int i = 1; i <= m; i++) {
+        int u, v;
+        cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    ll ans = 0;
+    int mx = -1;
+    for (auto u : v) {
+        if (!visited[u]) {
+            int edges = 0;
+            int vertices = 0;
+            dfs(u, -1, edges, vertices);
+            edges/=2;
+            if (vertices > 1) {
+                ans += 1LL*vertices*(vertices - 1)/2 - edges;
+            }
+            mx = max(mx, vertices);
+        }
+    }
+    // cout << ans << nline;
+    // cout << mx << nline;
+    // cout << visited[4] << nline;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) {
+            int edges = 0;
+            int vertices = 0;
+            dfs(i, -1, edges, vertices);
+            edges/=2;
+            if (vertices > 1) {
+                ans += 1LL*vertices*(vertices - 1)/2 - edges;
+            }
+            ans += 1LL * mx * vertices; 
+            mx = mx + vertices;
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

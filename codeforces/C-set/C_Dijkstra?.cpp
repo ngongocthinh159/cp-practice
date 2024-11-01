@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/20/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,7 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF 1e18
-#define IINF 1e9
+#define INF 1e18
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -92,12 +91,58 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-
+int n, m;
+vector<vector<pair<int,ll>>> g;
 void pre_compute() {
 
 }
-void solve() {
+void dijkstra(int src, vector<vector<pair<int,ll>>> &g) {
+    set<pair<ll,int>> S;
+    vector<ll> dist(n + 1, INF);
+    S.insert({0, src});
+    vector<int> par(n + 1, -1);
+    dist[src] = 0;
+    ll u, v, w_u;
+    while (S.size()) {
+        auto p = *S.begin();
+        S.erase(S.begin());
+        w_u = p.first;
+        u = p.second;
+        for (auto [v, w_uv] : g[u]) {
+            if (dist[v] > w_u + w_uv) {
+                S.erase({dist[v], v});
+                dist[v] = w_u + w_uv;
+                S.insert({dist[v], v});
 
+                par[v] = u;
+            }
+        }
+    }
+    if (par[n] == -1) {
+        cout << -1 << nline;
+        return;
+    }
+    string res = "";
+    int cur = n;
+    vector<int> vec;
+    do {
+        vec.pb(cur);
+        cur = par[cur];
+    } while (cur != -1);
+    reverse(all(vec));
+    for (auto x : vec) cout << x << " ";
+    cout << nline;
+}
+void solve() {
+    cin >> n >> m;
+    g.resize(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        g[u].push_back({v, w});
+        g[v].push_back({u, w});
+    }
+    dijkstra(1, g);
 }
 
 int main() {

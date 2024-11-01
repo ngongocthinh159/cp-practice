@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/295/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -92,12 +92,86 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-
+int n;
+vector<vector<pair<int,ll>>> g;
+vector<vector<pair<int,ll>>> g2;
 void pre_compute() {
 
 }
+struct comparator {
+    bool operator() (pair<ll,int> &p1, pair<ll,int> &p2) {
+        if (p2.first < p1.first) return true;
+        return false;
+    }
+};
+vector<ll> dijkstra(int src, vector<vector<pair<int,ll>>> &g, vector<bool> &vis) {
+    priority_queue<pair<ll,int>,vector<pair<ll,int>>,comparator> pq;
+    pq.push({0,src});
+    vector<bool> visited(n + 1);
+    vector<ll> d(n + 1, LINF);
+    d[src] = 0;
+    while (pq.size()) {
+        auto p = pq.top(); pq.pop();
+        int u = p.second;
+        if (visited[u]) continue;
+        visited[u] = true;
+        int w_u = p.first;
+        for (auto &[v, w_uv] : g[u]) {
+            if (vis[v]) {
+                if (d[v] > w_u + w_uv) {
+                    d[v] = w_u + w_uv;
+                    pq.push({d[v], v});
+                }
+            }
+        }
+    }
+    return d;
+}
 void solve() {
+    cin >> n;
+    g.resize(n + 1);
+    g2.resize(n + 1);
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            int x; cin >> x;
+            if (i == j) continue;
+            g[i].pb({j,x});
+            g2[j].pb({i,x});
+        }
+    }
+    vector<int> q(n);
+    for (int i = 0; i < n; i++) {
+        cin >> q[i];
+    }
+    reverse(all(q));
+    vector<vector<ll>> dist(n + 1, vector<ll>(n + 1, LINF));
+    vector<bool> vis(n + 1);
+    int cnt = 0;
+    vector<ll> ans;
+    while (cnt < n) {
+        int src = q[cnt];
+        dist[src][src] = 0;
+        vis[src] = true;
+        
+        auto d = dijkstra(src, g, vis);
+        auto d2 = dijkstra(src, g2, vis);
+        
+        ll res = 0;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (vis[i] && vis[j]) {
+                    dist[i][j] = min(dist[i][j], d2[i] + d[j]);
+                    res += dist[i][j];
+                }
+            }
+        }
+        ans.push_back(res);
 
+        cnt++;
+    }
+    reverse(all(ans));
+    for (auto x : ans ) cout << x << " ";
+    cout << nline;
 }
 
 int main() {
