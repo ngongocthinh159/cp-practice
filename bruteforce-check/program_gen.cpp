@@ -2,15 +2,11 @@
  * Author: Thinh Ngo Ngoc
  * Solution for: 
 */
-#pragma GCC optimize("O3,unroll-loops")
  
-#include<bits/stdc++.h>
-#include<ext/pb_ds/assoc_container.hpp>
-#include<ext/pb_ds/tree_policy.hpp>
+#include "bits/stdc++.h"
  
 using namespace std;
 using namespace chrono;
-using namespace __gnu_pbds;
 
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
@@ -44,7 +40,6 @@ freopen("Output.txt", "w", stdout);
 using ll = long long;
 using ull = unsigned long long;
 using lld = long double;
-typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
  
 void _print(ll t) {cerr << t;}
 void _print(int t) {cerr << t;}
@@ -64,8 +59,7 @@ template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_prin
 template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
-void _print(pbds v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
- 
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 /*---------------------------------------------------------------------------------------------------------------------------*/
 ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;} // only a >= 0 && b >= 0
@@ -101,12 +95,10 @@ void solve() {
 }
 
 int main() {
-#ifdef ThinhNgo
-    freopen("Error.txt", "w", stderr);
-#endif
     fastio();
-    IN_OUT();
-    auto start1 = high_resolution_clock::now();
+
+    freopen("input.txt", "w", stdout);
+
     int T = 1;
 #ifdef ThinhNgo_use_cases
     cin >> T;
@@ -115,9 +107,4 @@ int main() {
     while (T--) {
         solve();
     }
-    auto stop1 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop1 - start1);
-#ifdef ThinhNgo
-    cerr << "Time: " << duration . count() / 1000 << " ms" << endl;
-#endif
 }
