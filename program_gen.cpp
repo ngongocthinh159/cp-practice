@@ -105,7 +105,9 @@ int main() {
     freopen("Error.txt", "w", stderr);
 #endif
     fastio();
-    IN_OUT();
+    
+    freopen("input.txt", "w", stdout);
+
     auto start1 = high_resolution_clock::now();
     int T = 1;
 #ifdef ThinhNgo_use_cases

@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/1985/problem/H2
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,8 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF ((long long)1e18)
-#define IINF ((int)1e9)
+#define LINF 1e18
+#define IINF 1e9
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -88,16 +88,84 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
-
+int n, m;
 void pre_compute() {
 
 }
+vector<vector<int>> moves = {{1,0},{0,1},{-1,0},{0,-1}};
+void dfs(int i, int j, vector<bool> &vis, int &mnR, int &mxR, int &mnC, int &mxC, 
+vector<vector<char>> &matrix, int &size) {
+    vis[i*m + j] = true;
+    size++;
+    mnR = min(mnR, i);
+    mxR = max(mxR, i);
+    mnC = min(mnC, j);
+    mxC = max(mxC, j);
+    for (auto &move : moves) {
+        int I = i + move[0];
+        int J = j + move[1];
+        if (1 <= I && I <= n && 1 <= J && J <= m && !vis[I*m + J] && matrix[I][J] == '#') {
+            dfs(I, J, vis, mnR, mxR, mnC, mxC, matrix, size);
+        }
+    }
+}
 void solve() {
+    cin >> n >> m;
+    vector<vector<char>> matrix(n + 1, vector<char>(m + 1));
+    vector<int> free_row(n + 1);
+    vector<int> free_col(m + 1);
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            cin >> matrix[i][j];
+            if (matrix[i][j] == '.') free_row[i]++, free_col[j]++;
+        }
+    }
+    vector<bool> vis((n+1)*(m+1));
+    vector<int> row(n + 2);
+    vector<int> col(m + 2);
+    vector<vector<int>> effect(n + 2, vector<int>(m + 2));
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (matrix[i][j] == '#' && !vis[i*m + j]) {
+                int mnR = IINF, mxR = -IINF, mnC = IINF, mxC = -IINF;
+                int size = 0;
+                dfs(i, j, vis, mnR, mxR, mnC, mxC, matrix, size);
+                
+                mnR = max(mnR - 1, 1);
+                mxR = min(mxR + 1, n);
+                mnC = max(mnC - 1, 1);
+                mxC = min(mxC + 1, m);
 
+                row[mnR] += size;
+                row[mxR + 1] -= size;
+                col[mnC] += size;
+                col[mxC + 1] -= size;
+
+                effect[mnR][mnC] += size;
+                effect[mnR][mxC + 1] -= size;
+                effect[mxR + 1][mnC] -= size;
+                effect[mxR + 1][mxC + 1] += size;
+            }
+        }
+    }
+    for (int i = 1; i <= n; i++) row[i] = row[i] + row[i - 1];
+    for (int i = 1; i <= m; i++) col[i] = col[i] + col[i - 1];
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            effect[i][j] = effect[i - 1][j] + effect[i][j - 1] - effect[i - 1][j - 1] + effect[i][j];
+        }
+    }
+    int ans = -1;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            ans = max(ans, row[i] + col[j] - effect[i][j] + free_row[i] + free_col[j] - (matrix[i][j] == '.'));
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

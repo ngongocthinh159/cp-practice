@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2036/problem/F
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,8 +21,8 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define LINF ((long long)1e18)
-#define IINF ((int)1e9)
+#define LINF 1e18
+#define IINF 1e9
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
@@ -88,7 +88,7 @@ ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
@@ -96,8 +96,33 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 void pre_compute() {
 
 }
-void solve() {
+ll _query(ll hi) {
+    if ((hi + 1) % 4 == 0) return 0;
+    if ((hi + 1) % 4 == 1) return hi;
+    if ((hi + 1) % 4 == 2) return 1;
+    if ((hi + 1) % 4 == 3) return hi + 1;
+}
+ll query(ll l, ll r) {
+    return _query(r) ^ _query(l - 1);
+}
+ll l, r, i, k;
+ll ans(ll hi) {
+    if (hi < k) return query(0, hi);
+    ll _2powi = (1 << i);
+    ll cnt = (hi - k)/_2powi;
+    ll res = query(0, hi);
 
+    while (cnt%4 != 3 && cnt >= 0) {
+        res = res ^ (cnt*_2powi + k);
+        cnt--;
+    }
+
+    return res;
+}
+void solve() {
+    cin >> l >> r >> i >> k;
+    ll res = ans(r) ^ ans(l - 1);
+    cout << res << nline;
 }
 
 int main() {

@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/edu/course/2/lesson/9/2/practice/contest/307093/problem/G
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -91,13 +91,61 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
+#define LOG 20
 
-
+ll n;
+const int mxn = 1e5 + 5;
+ll a[mxn];
 void pre_compute() {
 
 }
+struct MonoStack {
+    vector<ll> st;
+    vector<ll> gcd_st; // gcd history till element
+    ll top() {
+        return st.back();
+    }
+    void pop() {
+        st.pop_back();
+        gcd_st.pop_back();
+    }
+    void push(ll x) {
+        st.push_back(x);
+        gcd_st.push_back(gcd_st.size() == 0 ? x : gcd(x, gcd_st.back()));
+    }
+    ll get_gcd() {
+        if (gcd_st.size() == 0) return 0;
+        return gcd_st.back();
+    }
+    bool empty() {
+        return st.size() == 0;
+    }
+    int size() {
+        return st.size();
+    }
+};
 void solve() {
+    cin >> n;
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int res = IINF;
+    int l = 0;
+    MonoStack s1, s2;
+    for (int r = 0; r < n; r++) {
+        s1.push(a[r]);
 
+        while (gcd(s1.get_gcd(), s2.get_gcd()) == 1) {
+            res = min(res, r - l + 1);
+            if (s2.empty()) {
+                while (s1.size()) {
+                    s2.push(s1.top());
+                    s1.pop();
+                }
+            }
+            s2.pop();
+            l++;
+        }
+    }
+    cout << (res == IINF ? -1 : res) << nline;
 }
 
 int main() {

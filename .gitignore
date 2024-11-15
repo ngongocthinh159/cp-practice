@@ -6,9 +6,10 @@
 input.txt
 output.txt
 error.txt
+output_brute.txt
 
 program.cpp
-program copy.cpp
+program copy*.cpp
 tempCodeRunnerFile.cpp
 
 A.cpp
