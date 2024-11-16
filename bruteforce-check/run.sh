@@ -3,8 +3,13 @@
 compiler="g++"
 flags="-std=c++14 -Wall -Wextra -O2"
 compile="${compiler} ${flags}"
+find_different="git diff --no-index ./output.txt ./output_brute.txt"
 
-for i in {1..2}
+RED='\033[0;31m'
+YEL='\033[1;33m'
+NC='\033[0m' # No Color
+
+for i in {1..100}
 do
     # gen input -> input.txt
     $compile ./program_gen.cpp -o ./program_gen
@@ -18,14 +23,22 @@ do
     $compile ./program_brute.cpp -o ./program_brute
     ./program_brute
 
-    # compare outputs
-    result=$(git diff --no-index ./output.txt ./output_brute.txt)
-    echo result
-    # diff ./output.txt ./output_brute.txt
-    # comm -23 <(sort ./output.txt) <(sort ./output_brute.txt)
-    # sdiff -s ./output.txt ./output_brute.txt
-
+    # clear compiled file
     rm program_gen program program_brute
 
-    echo "$i"
+    # loop number
+    printf "\n"
+    printf "\n"
+    printf "Case: $i\n"
+
+    # compare outputs
+    diff=$($find_different)
+    if [[ -n $diff ]]; then
+        printf "${RED}Input${NC}\n"
+        cat input.txt
+        printf "\n"
+        printf "${YEL}Different${NC}\n"
+        $find_different
+        break  # Break the loop if there is a difference
+    fi
 done

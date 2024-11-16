@@ -87,11 +87,46 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
+ll n, p;
+const int mxn = 2e3 + 5;
+ll a[mxn];
 void pre_compute() {
 
 }
 void solve() {
+    cin >> n >> p;
+    ll tot = 0;
+    for (int i = 0; i< n; i++) cin >> a[i], tot += a[i];
+    ll less_sum = p%tot;
+    ll repeat = p/tot;
+    if (less_sum == 0) {
+        cout << 1 << " " << repeat*n << nline;
+        return;
+    }
+    int l = 0, r = 0;
+    ll sum = 0;
+    int mn = IINF;
+    int idx = -1;
+    for (int i = n; i < 2*n; i++) a[i] = a[i - n];
+    while (r < 2*n) {
+        sum += a[r];
 
+        while (l <= r && sum - a[l] >= less_sum) {
+            sum -= a[l];
+            l++;
+        }
+
+        if (sum >= less_sum && l < n) {
+            if (mn > r - l + 1) {
+                mn = r - l + 1;
+                idx = l;
+            }
+        }
+
+        r++;
+    }
+
+    cout << (idx + 1) << " " << (repeat*n + mn) << nline;
 }
 
 int main() {
