@@ -7,6 +7,7 @@ find_different="git diff --no-index ./output.txt ./output_brute.txt"
 
 RED='\033[0;31m'
 YEL='\033[1;33m'
+GRN='\033[0;32m'
 NC='\033[0m' # No Color
 
 for i in {1..100}
@@ -40,5 +41,9 @@ do
         printf "${YEL}Different${NC}\n"
         $find_different
         break  # Break the loop if there is a difference
+    else
+        printf "${GRN}Same output${NC}\n"
+        cat output.txt
+        printf "\n"
     fi
 done
