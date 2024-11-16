@@ -11,7 +11,7 @@ output_brute.txt
 program.cpp
 program copy*.cpp
 tempCodeRunnerFile.cpp
-bruteforce-check/
+# bruteforce-check/
 
 A.cpp
 B.cpp
