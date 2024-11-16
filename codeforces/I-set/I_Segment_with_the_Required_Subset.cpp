@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/edu/course/2/lesson/9/3/practice/contest/307094/problem/I
 */
  
 #include "bits/stdc++.h"
@@ -87,19 +87,95 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
+const int MX = 1001;
 
+struct Stack {
+    vector<int> st;
+    vector<bitset<MX>> st_subsum;
+    int mx_sum;
+    Stack(int mx_sum) {
+        this->mx_sum = mx_sum;
+    }
+    void push(int x, int t) {
+        if (!t) {
+            bitset<MX> a = 0;
+            a.set(x);
+            if (st_subsum.size()) a |= st_subsum.back() | (st_subsum.back() << x);
+            st_subsum.push_back(a);
+        } else {
+            bitset<MX> a = 0;
+            a.set(mx_sum - x);
+            if (st_subsum.size()) a |= st_subsum.back() | (st_subsum.back() >> x);
+            st_subsum.push_back(a);
+        }
+        st.push_back(x);
+    }
+    pair<int,bitset<MX>> top() {
+        return {st.back(), st_subsum.back()};
+    }
+    void pop() {
+        st.pop_back();
+        st_subsum.pop_back();
+    }
+    bool empty() {
+        return st.empty();
+    }
+};
+const int mxn = 1e5 + 5;
+int n, mx_sum;
+int a[mxn];
 void pre_compute() {
 
 }
+bool has_subset(Stack &s1, Stack &s2) {
+    bool res;
+    if (s1.empty() && s2.empty()) {
+        res = false;
+    } else if (s1.empty()) {
+        res = s2.top().second.test(mx_sum);
+    } else if (s2.empty()) {
+        res = s1.top().second.test(0);
+    } else {
+        if (s2.top().second.test(mx_sum) || s1.top().second.test(0)) {
+            res = true;
+        } else {
+            res = (s1.top().second & s2.top().second).any();
+        }
+    }
+    return res;
+}
+void removeLeft(Stack &s1, Stack &s2) {
+    if (s1.empty()) {
+        while (!s2.empty()) {
+            s1.push(s2.top().first, 1);
+            s2.pop();
+        }
+    }
+    s1.pop();
+}
 void solve() {
-    
+    cin >> n >> mx_sum;
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int l = 0;
+    int ans = IINF;
+    Stack s1(mx_sum), s2(mx_sum); // s2: bit x set mean can create subsum = x, s1: bit x set mean can create subsum of mx_sum - x
+    for (int r = 0; r < n; r++) {
+        s2.push(a[r], 0);
+
+        bool ok_subset = has_subset(s1, s2);
+        while (l <= r && ok_subset) {   
+            ans = min(ans, r - l + 1);
+            removeLeft(s1, s2);
+            ok_subset = has_subset(s1, s2);
+            l++;
+        }
+    }
+    cout << (ans == IINF ? -1 : ans) << nline;
 }
 
 int main() {
     fastio();
-    
-    freopen("../input.txt", "r", stdin);
-    freopen("../output.txt", "w", stdout);
+    IN_OUT();
 
     int T = 1;
 #ifdef ThinhNgo_use_cases

@@ -1,12 +1,16 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/edu/course/2/lesson/9/3/practice/contest/307094/problem/H
 */
+#pragma GCC optimize("O3,unroll-loops")
  
-#include "bits/stdc++.h"
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
  
 using namespace std;
 using namespace chrono;
+using namespace __gnu_pbds;
 
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
@@ -40,6 +44,7 @@ freopen("Output.txt", "w", stdout);
 using ll = long long;
 using ull = unsigned long long;
 using lld = long double;
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
  
 void _print(ll t) {cerr << t;}
 void _print(int t) {cerr << t;}
@@ -59,7 +64,8 @@ template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_prin
 template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
-
+void _print(pbds v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+ 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 /*---------------------------------------------------------------------------------------------------------------------------*/
 ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_ctz(a | b); a >>= __builtin_ctz(a); do { b >>= __builtin_ctz(b); if (a > b) swap(a, b); b -= a; } while (b); return a << shift;} // only a >= 0 && b >= 0
@@ -78,7 +84,7 @@ ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) %
 ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
 ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
-ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
@@ -86,21 +92,42 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-
-
+int n, m, mx_w, wa, wb;
+const int mxn = 1e5 + 5;
+ll cost_a[mxn], cost_b[mxn];
 void pre_compute() {
 
 }
 void solve() {
-    
+    cin >> n >> m >> mx_w >> wa >> wb;
+    for (int i = 0; i < n; i++) cin >> cost_a[i];
+    for (int i = 0; i < m; i++) cin >> cost_b[i];
+    sort(cost_a, cost_a + n, greater<ll>());
+    sort(cost_b, cost_b + m, greater<ll>());
+    vector<ll> pre_a(n);
+    vector<ll> pre_b(m);
+    for (int i = 0; i < n; i++) pre_a[i] = cost_a[i] + (i - 1 >= 0 ? pre_a[i - 1] : 0);
+    for (int i = 0; i < m; i++) pre_b[i] = cost_b[i] + (i - 1 >= 0 ? pre_b[i - 1] : 0);
+    ll ans = 0;
+    for (int i = 0; i <= n; i++) {
+        if (1LL*i*wa <= mx_w) {
+            ll cur = 0;
+            int j = min((mx_w - i*wa)/wb, m);
+            if (i >= 1) cur += pre_a[i - 1];
+            if (j >= 1) cur += pre_b[j - 1];
+            ans = max(ans, cur);
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {
+#ifdef ThinhNgo
+    freopen("Error.txt", "w", stderr);
+#endif
     fastio();
-    
-    freopen("../input.txt", "r", stdin);
-    freopen("../output.txt", "w", stdout);
-
+    IN_OUT();
+    auto start1 = high_resolution_clock::now();
     int T = 1;
 #ifdef ThinhNgo_use_cases
     cin >> T;
@@ -109,4 +136,9 @@ int main() {
     while (T--) {
         solve();
     }
+    auto stop1 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop1 - start1);
+#ifdef ThinhNgo
+    cerr << "Time: " << duration . count() / 1000 << " ms" << endl;
+#endif
 }

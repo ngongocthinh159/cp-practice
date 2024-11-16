@@ -86,41 +86,18 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-ll n, p;
-const int mxn = 2e3 + 5;
-ll a[mxn];
 void pre_compute() {
 
 }
 void solve() {
-    cin >> n >> p;
-    ll tot = 0;
-    for (int i = 0; i < n; i++) cin >> a[i], tot += a[i];
-    ll less_sum = p%tot;
-    ll repeat = p/tot;
-    int ans = IINF, _l = -2;
-    for (int l = 0; l < n; l++) {
-        int r = l;
-        ll sum = 0;
-        int cnt = 0;
-        while (sum < less_sum) {
-            cnt++;
-            sum += a[r];
-            r = (r + 1)%n;
-        }
-        if (ans > cnt) {
-            ans = cnt;
-            _l = l;
-        }
-    }
-    cout << (_l + 1) << " " << (repeat*n + ans) << nline;
+
 }
 
 int main() {
     fastio();
     
-    freopen("input.txt", "r", stdin);
-    freopen("output_brute.txt", "w", stdout);
+    freopen("../input.txt", "r", stdin);
+    freopen("../output_brute.txt", "w", stdout);
     
     int T = 1;
 #ifdef ThinhNgo_use_cases

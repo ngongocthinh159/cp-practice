@@ -91,19 +91,13 @@ void pre_compute() {
 
 }
 void solve() {
-    ll n = randint(1,30);
-    ll p = randint(1e12,1e15);
-    cout << n << " " << p << nline;
-    for (int i = 0; i < n; i++) {
-        if (i != 0) cout << " ";
-        cout << randint(1, 1e9);
-    }
+    
 }
 
 int main() {
     fastio();
 
-    freopen("input.txt", "w", stdout);
+    freopen("../input.txt", "w", stdout);
 
     int T = 1;
 #ifdef ThinhNgo_use_cases

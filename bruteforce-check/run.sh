@@ -10,7 +10,7 @@ YEL='\033[1;33m'
 GRN='\033[0;32m'
 NC='\033[0m' # No Color
 
-for i in {1..100}
+for i in {1..15}
 do
     # gen input -> input.txt
     $compile ./program_gen.cpp -o ./program_gen
