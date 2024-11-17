@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://www.spoj.com/problems/ARBITRAG/
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -161,9 +161,6 @@ void solve() {
         int u = nameToId[s];
         int v = nameToId[t];
         edges.push_back({w,{u,v}});
-    }
-    if (!nameToId.count("USDollar")) {
-        cout << "No" << nline;
     }
     if (bellman()) cout << "Yes" << nline;
     else cout << "No" << nline;
