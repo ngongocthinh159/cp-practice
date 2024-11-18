@@ -3,7 +3,7 @@
 compiler="g++"
 flags="-std=c++14 -Wall -Wextra -O2"
 compile="${compiler} ${flags}"
-find_different="git diff --no-index ./output.txt ./output_brute.txt"
+find_different="git diff --no-index ../output.txt ../output_brute.txt"
 
 RED='\033[0;31m'
 YEL='\033[1;33m'
@@ -36,14 +36,14 @@ do
     diff=$($find_different)
     if [[ -n $diff ]]; then
         printf "${RED}Input${NC}\n"
-        cat input.txt
+        cat ../input.txt
         printf "\n"
         printf "${YEL}Different${NC}\n"
         $find_different
         break  # Break the loop if there is a difference
     else
         printf "${GRN}Same output${NC}\n"
-        cat output.txt
+        cat ../output.txt
         printf "\n"
     fi
 done

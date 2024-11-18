@@ -91,7 +91,15 @@ void pre_compute() {
 
 }
 void solve() {
-    
+    int n = randint(1, 10);
+    vector<int> v;
+    for (int i = 0; i < n; i++) {
+        v.push_back(i + 1);
+        v.push_back(i + 1);
+    }
+    random_shuffle(all(v));
+    cout << n << nline;
+    for (auto x : v) cout << x << " ";
 }
 
 int main() {
