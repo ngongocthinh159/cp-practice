@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1389/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -89,27 +89,34 @@ struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 #define ThinhNgo_use_cases
-#define MAX 1005
+#define MAX 300005
 
 
 
 void pre_compute() {
 
 }
-int n, k;
-ll dp[MAX][MAX];
+int n, k, z;
+ll a[MAX];
 void solve() {
-    cin >> n >> k;
-    for (int i = 0; i <= k; i++) dp[i][0] = 1;
-    for (int j = 0; j <= n; j++) dp[0][j] = 0;
-    for (int i = 1; i <= k; i++) {
-        for (int j = 1; j <= n; j++) {
-            dp[i][j] = dp[i][j - 1];
-            dp[i][j] += dp[i - 1][n - j];
-            dp[i][j] %= MOD; 
+    cin >> n >> k >> z;
+    vector<ll> mx(n, -1);
+    vector<ll> pref(n + 1);
+    for (int i = 0; i < n; i++) cin >> a[i], pref[i + 1] = a[i] + pref[i];
+    for (int i = 1; i < n; i++) {
+        mx[i] = max(mx[i - 1], a[i] + a[i - 1]);
+    }
+    ll ans = -1;
+    for (int t = 0; t <= z && 2*t <= k; t++) {
+        int r = k - 2*t;
+        ll cur = 0;
+        if (r <= n - 1) {
+            cur += mx[min(n - 1, r + 1)]*t;
+            cur += pref[r + 1];
+            ans = max(ans, cur);
         }
     }
-    cout << dp[k][n] << nline;
+    cout << ans << nline;
 }
 
 int main() {

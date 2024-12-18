@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/1407/C
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -88,28 +88,56 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-#define ThinhNgo_use_cases
-#define MAX 1005
+// #define ThinhNgo_use_cases
+
 
 
 
 void pre_compute() {
 
 }
-int n, k;
-ll dp[MAX][MAX];
+vector<int> arr = {1, 3, 2};
+int query(int i, int j) {
+    cout << "? " << i << " " << j << endl;
+    int res; cin >> res;
+    return res;
+    // return arr[i - 1] % arr[j - 1];
+}
+int n;
 void solve() {
-    cin >> n >> k;
-    for (int i = 0; i <= k; i++) dp[i][0] = 1;
-    for (int j = 0; j <= n; j++) dp[0][j] = 0;
-    for (int i = 1; i <= k; i++) {
-        for (int j = 1; j <= n; j++) {
-            dp[i][j] = dp[i][j - 1];
-            dp[i][j] += dp[i - 1][n - j];
-            dp[i][j] %= MOD; 
+    cin >> n;
+    vector<int> ans(n + 1, -1);
+    vector<int> v;
+    for (int i = 1; i <= n; i++) v.pb(i);
+    vector<bool> found(n + 1);
+    while (sz(v) >= 2) {
+        int i = v.back(); v.pop_back();
+        int j = v.back(); v.pop_back();
+        int ans1 = query(i, j);
+        int ans2 = query(j, i);
+        if (ans1 > ans2) {
+            ans[i] = ans1;
+            found[ans1] = true;
+            v.push_back(j);
+        } else {
+            ans[j] = ans2;
+            found[ans2] = true;
+            v.push_back(i);
         }
     }
-    cout << dp[k][n] << nline;
+    int last;
+    for (int i = 1; i <= n; i++) if (!found[i]) {
+        last = i; break;
+    }
+    for (int i = 1; i <= n; i++) if (ans[i] == -1) {
+        ans[i] = last;
+        break;
+    }
+    string res = "!";
+    for (int i = 1; i <= n; i++) {
+        res += " " + to_string(ans[i]);
+    }
+    cout << res << endl;
 }
 
 int main() {
