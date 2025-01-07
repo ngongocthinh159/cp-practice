@@ -33,6 +33,7 @@ freopen("Output.txt", "w", stdout);
 #define set_bits(x) __builtin_popcountll(x)
 #define sz(x) ((int)(x).size())
 #define all(x) (x).begin(), (x).end()
+#define rep(i,a,n) for (int i=(a);i<(n);i++)
 
 // #define ThinhNgo
 #ifdef ThinhNgo
