@@ -40,6 +40,8 @@ do
         printf "\n"
         printf "${YEL}Different${NC}\n"
         $find_different
+
+        printf "${RED}diff${NC}"
         break  # Break the loop if there is a difference
     else
         printf "${GRN}Same output${NC}\n"
