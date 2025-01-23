@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&category=22&page=show_problem&problem=1960
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -90,16 +90,63 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
-
+#define MAXN 1005
+#define MAXX 105
+int n, m, x, y;
+char mat[MAXN][MAXN], pat[MAXX][MAXX];
+ll bp[MAXN], ibp[MAXN];
+const int base = 33;
 void pre_compute() {
+    bp[0] = 1;
+    for (int i = 1; i < MAXN; i++) bp[i] = bp[i - 1] * base % MOD;
+    ibp[MAXN - 1] = expo(bp[MAXN - 1], MOD - 2, MOD);
+    for (int i = MAXN - 2; i >= 0; i--) ibp[i] = ibp[i + 1] * base % MOD;
+}
+bool isEqual(int i, int j, int len, int start_row1, int start_row2, vector<vector<ll>> &p1, vector<vector<ll>> &p2) {
+    ll hash1 = (p1[i][start_row1 + len] - p1[i][start_row1]) % MOD;
+    if (hash1 < 0) hash1 += MOD;
+    hash1 = (hash1 * ibp[start_row1]) % MOD;
 
+    ll hash2 = (p2[j][start_row2 + len] - p2[j][start_row2]) % MOD;
+    if (hash2 < 0) hash2 += MOD;
+    hash2 = (hash2 * ibp[start_row2]) % MOD;
+    
+    return hash1 == hash2;
 }
 void solve() {
-
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> mat[i][j];
+    cin >> x >> y;
+    for (int i = 0; i < x; i++)
+        for (int j = 0; j < y; j++) cin >> pat[i][j];
+    vector<vector<ll>> pref_pat(y, vector<ll>(x + 1));
+    for (int j = 0; j < y; j++)
+        for (int i = 0; i < x; i++) pref_pat[j][i + 1] = (pref_pat[j][i] + (pat[i][j] - 'a' + 1)*bp[i]%MOD) % MOD;
+    vector<vector<ll>> pref_mat(m, vector<ll>(n + 1));
+    for (int j = 0; j < m; j++)
+        for (int i = 0; i < n; i++) pref_mat[j][i + 1] = (pref_mat[j][i] + (mat[i][j] - 'a' + 1)*bp[i]%MOD) % MOD;
+    vector<int> kmp_pat(y);
+    int k = 0;
+    for (int i = 1; i < y; i++) {
+        while (k == y || (k > 0 && !isEqual(i, k, x, 0, 0, pref_pat, pref_pat))) k = kmp_pat[k - 1];
+        kmp_pat[i] = isEqual(i, k, x, 0, 0, pref_pat, pref_pat) ? ++k : 0;
+    }
+    vector<int> match(m);
+    int ans = 0;
+    for (int i = 0; i < n - x + 1; i++) {
+        int k = 0;
+        for (int j = 0; j < m; j++) {
+            while (k == y || (k > 0 && !isEqual(k, j, x, 0, i, pref_pat, pref_mat))) k = kmp_pat[k - 1];
+            match[j] = isEqual(k, j, x, 0, i, pref_pat, pref_mat) ? ++k : 0;
+            if (match[j] == y) ans++;
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

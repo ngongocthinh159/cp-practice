@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/808/G
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -93,13 +93,50 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-
-
+#define MAXN 100005
+string t, s;
+int n, m;
+int pref_s[MAXN];
+bool should_take[MAXN];
 void pre_compute() {
 
 }
+void kmp(string &s, int pref[MAXN]) {
+    int j = 0;
+    FOR(i,1,sz(s)) {
+        while (j > 0 && s[i] != s[j]) j = pref[j - 1];
+        pref[i] = s[i] == s[j] ? ++j : 0;
+    }
+}
+ll dfs(int i, int prev_match, vector<vector<ll>> &dp) {
+    if (i == n) return 0;
+    if (dp[i][prev_match] != -1) return dp[i][prev_match];
+    ll res = 0;
+    if (t[i] != '?') {
+        int j = prev_match;
+        while (j == sz(s) || (j > 0 && t[i] != s[j])) j = pref_s[j - 1];
+        int match = t[i] == s[j] ? ++j : 0;
+        res = (match == sz(s)) + dfs(i + 1, match, dp);
+    } else {
+        for (int c = 0; c < 26; c++) {
+            if (should_take[c]) {
+                int j = prev_match;
+                while (j == sz(s) || (j > 0 && (c + 'a') != s[j])) j = pref_s[j - 1];
+                int match = (c + 'a') == s[j] ? ++j : 0;
+                res = max(res, (match == sz(s)) + dfs(i + 1, match, dp));
+            }
+        }
+    }
+    return dp[i][prev_match] = res;
+}
 void solve() {
-
+    cin >> t >> s;
+    n = sz(t), m = sz(s);
+    kmp(s, pref_s);
+    FOR(i,0,sz(s)) should_take[s[i] - 'a'] = true;
+    vector<vector<ll>> dp(n,
+        vector<ll>(m + 1, -1));
+    cout << dfs(0, 0, dp) << nline;
 }
 
 int main() {

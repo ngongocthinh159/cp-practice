@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/25/E
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -93,13 +93,67 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
+#define MAXN 100005
+#define MAX 3
 
-
+int match[MAX][MAX][MAXN], pref[MAX][MAXN];
+string ss[MAX];
+void kmp(int idx) {
+    string s = ss[idx];
+    int j = 0;
+    FOR(i,1,sz(s)) {
+        while (j > 0 && s[i] != s[j]) j = pref[idx][j - 1];
+        pref[idx][i] = s[i] == s[j] ? ++j : 0;
+    }
+}
+void match_func(int idx1, int idx2) {
+    string s = ss[idx1];
+    string t = ss[idx2];
+    int j = 0;
+    FOR(i,0,sz(t)) {
+        while (j > 0 && t[i] != s[j]) j = pref[idx1][j - 1];
+        match[idx1][idx2][i] = t[i] == s[j] ? ++j : 0;
+    }
+}
 void pre_compute() {
 
 }
+int find_ans(vector<int> &v) {
+    if (sz(v) == 1) return sz(ss[v[0]]);
+    int res = sz(ss[v[0]]);
+    for (int idx1 = 0; idx1 < sz(v); idx1++) {
+        int idx2 = idx1 + 1;
+        if (idx2 < sz(v)) {
+            int i = v[idx1], j = v[idx2];
+            res += sz(ss[j]) - match[j][i][sz(ss[i]) - 1];
+        }
+    }
+    return res;
+}
 void solve() {
-
+    for (int i = 0; i < MAX; i++) cin >> ss[i];
+    sort(ss, ss + MAX, [&](string &s1, string &s2) {
+        return sz(s1) < sz(s2);
+    });
+    for (int i = 0; i < MAX; i++) kmp(i);
+    for (int i = 0; i < MAX; i++)
+        for (int j = i + 1; j < MAX; j++) match_func(i, j), match_func(j, i);
+    vector<int> v;
+    for (int i = 0; i < MAX; i++) {
+        bool contained = false;
+        for (int j = i + 1; j < MAX; j++) {
+            for (int k = 0; k < sz(ss[j]); k++) if (match[i][j][k] == sz(ss[i])) {
+                contained = true;
+                break;
+            }
+        }
+        if (!contained) v.push_back(i);
+    }
+    int ans = INT_MAX;
+    do {
+        ans = min(ans, find_ans(v));
+    } while (next_permutation(all(v)));
+    cout << ans << nline;
 }
 
 int main() {
