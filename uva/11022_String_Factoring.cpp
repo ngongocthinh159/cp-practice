@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://vjudge.net/problem/UVA-11022/origin
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -113,12 +113,52 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
-
+#define MAX 85
+int dp[MAX][MAX], rotation_len[MAX][MAX], pref[MAX], _pref[MAX];
+string s;
+int n;
+void cal_len() {
+    for (int start = 0; start < n; start++) {
+        int j = start, match, len;
+        _pref[j] = 0;
+        rotation_len[start][start] = 1;
+        for (int i = start + 1; i < n; i++) {
+            while (j > start && s[i] != s[j]) j = _pref[j - 1] + start;
+            match = s[i] == s[j] ? (++j - start) : 0;
+            
+            len = i - start + 1;
+            int k = len - match;
+            if (len%k==0) rotation_len[start][i] = k;
+            else rotation_len[start][i] = len;
+        }
+    }
+}
+void kmp() {
+    int j = 0;
+    for (int i = 1; i < n; i++) {
+        while (j > 0 && s[i] != s[j]) j = pref[j - 1];
+        pref[i] = s[i] == s[j] ? ++j : 0;
+    }
+}
+int dfs(int l, int r) {
+    if (l == r) return 1;
+    if (dp[l][r] != -1) return dp[l][r];
+    int res = rotation_len[l][r];
+    FOR(i,l,r-1) {
+        if (i - l + 1 == rotation_len[l][r]) res = min(res, dfs(l, i));
+        else res = min(res, dfs(l, i) + dfs(i + 1, r));
+    }
+    return dp[l][r] = res;
+}
 void pre_compute() {
 
 }
 void solve() {
-
+    n = SZ(s);
+    kmp();
+    cal_len();
+    FOR(i,0,n-1) FOR(j,0,n-1) dp[i][j] = -1;
+    cout << dfs(0, n - 1) << nline;
 }
 
 int main() {
@@ -133,7 +173,9 @@ int main() {
     cin >> T;
 #endif
     pre_compute();
-    while (T--) {
+    while (true) {
+        cin >> s;
+        if (s == "*") break;
         solve();
     }
     auto stop1 = high_resolution_clock::now();

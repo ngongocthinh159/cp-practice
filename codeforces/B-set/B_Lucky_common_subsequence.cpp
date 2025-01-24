@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/problemset/problem/346/B
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -114,11 +114,86 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 
 
 
+#define MAX 105
+#define next __next
+int dp[MAX][MAX][MAX], next[MAX][26], pref[MAX], trace[MAX][MAX][MAX];
+string s1, s2, virus;
+int n, m, p;
+void kmp() {
+    int j = 0;
+    for (int i = 1; i < p; i++) {
+        while (j > 0 && virus[i] != virus[j]) j = pref[j - 1];
+        pref[i] = virus[i] == virus[j] ? ++j : 0;
+    }
+}
+void calc_next() {
+    for (int prev_match = 0; prev_match <= p; prev_match++)
+        for (int c = 0; c < 26; c++) {
+            if (prev_match < p && virus[prev_match] == (c + 'A')) next[prev_match][c] = prev_match + 1;
+            else {
+                if (prev_match > 0) next[prev_match][c] = next[pref[prev_match - 1]][c];
+                else next[prev_match][c] = 0;
+            }
+        }
+}
 void pre_compute() {
 
 }
 void solve() {
+    cin >> s1 >> s2 >> virus;
+    n = SZ(s1);
+    m = SZ(s2);
+    p = SZ(virus);
+    kmp();
+    calc_next();
+    int next_match;
+    int c;
+    memset(trace, -1, sizeof trace);
+    memset(dp, -1, sizeof dp);
+    dp[0][0][0] = 0;
+    for (int i = 0; i <= n; i++)
+        for (int j = 0; j <= m; j++)
+            for (int k = 0; k < p; k++) if (dp[i][j][k] >= 0) {
+                c = trace[i][j][k] & (MASK(5) - 1);
+                if (s1[i] != s2[j]) {
+                    if (maximize(dp[i + 1][j][k], dp[i][j][k])) {
+                        trace[i + 1][j][k] = trace[i][j][k];
+                    }
+                    if (maximize(dp[i][j + 1][k], dp[i][j][k])) {
+                        trace[i][j + 1][k] = trace[i][j][k];
+                    }
+                } else {
+                    // choose
+                    next_match = next[k][s1[i] - 'A'];
+                    if (maximize(dp[i + 1][j + 1][next_match], 1 + dp[i][j][k])) {
+                        trace[i + 1][j + 1][next_match] = (i << 19) ^ (j << 12) ^ (k << 5) ^ (s1[i] - 'A');
+                    }
 
+                    // not choose
+                    if (maximize(dp[i + 1][j + 1][k], dp[i][j][k])) {
+                        trace[i + 1][j + 1][k] = trace[i][j][k];
+                    }
+                }
+            }
+    int bestI = n, bestJ = m, bestK, bestResult = 0;
+    for (int k = 0; k < p; k++) if (maximize(bestResult, dp[n][m][k])) bestK = k;
+    if (bestResult == 0) {
+        cout << 0 << nline;
+        return;
+    }
+
+    string res;
+    while (trace[bestI][bestJ][bestK] != -1) {
+        int tmp = trace[bestI][bestJ][bestK];
+        int c = tmp & (MASK(5) - 1); tmp >>= 5;
+        int k = tmp & (MASK(7) - 1); tmp >>= 7;
+        int j = tmp & (MASK(7) - 1); tmp >>= 7;
+        int i = tmp & (MASK(7) - 1); tmp >>= 7;
+        res += (c + 'A');
+        bestI = i, bestJ = j, bestK = k;
+    }
+    reverse(ALL(res));
+    cout << res << nline;
 }
 
 int main() {

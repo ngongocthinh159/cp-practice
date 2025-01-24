@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://vjudge.net/problem/UVA-11452/origin
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -109,16 +109,39 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
-
-
+#define MAX 2005
+string s;
+int n, pref[MAX];
 void pre_compute() {
 
 }
 void solve() {
-
+    cin >> s;
+    n = SZ(s);
+    int j = 0, k, remain_len;
+    for (int i = 1; i < n; i++) {
+        while (j > 0 && s[i] != s[j]) j = pref[j - 1];
+        pref[i] = s[i] == s[j] ? ++j : 0;
+    }
+    string res;
+    for (int i = 0; i < n; i++) {
+        k = (i + 1);
+        if (2*k <= n && 3*k > n) {
+            remain_len = n - 2*k;
+            if (pref[2*k - 1] >= k && pref[n - 1] >= remain_len) {
+                int ii = remain_len;
+                REP(cnt,8) {
+                    res += s[ii++];
+                    if (ii == k) ii = 0;
+                }
+                break;
+            }
+        }
+    }   
+    cout << res << "..." << nline;
 }
 
 int main() {
