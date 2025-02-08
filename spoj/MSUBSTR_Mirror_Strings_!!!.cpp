@@ -109,7 +109,7 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-// #define ThinhNgo_use_cases
+#define ThinhNgo_use_cases
 
 
 
@@ -168,14 +168,25 @@ void pre_compute() {
 }
 void solve() {
     cin >> s;
-    int n = s.size();
+    int n = SZ(s);
+    int len = 1, idx = 0;
     Manacher mana(s);
-    ll ans = 0;
+    int cnt = 0;
     for (int i = 0; i < n; i++) {
-        ans += mana.get_p_at(i);
-        if (i >= 1) ans += mana.get_p_at(i, false);
-    }
-    cout << ans << nline;
+        if (len == mana.get_longest(i)) {
+            cnt++;
+        } else if (maximize(len, mana.get_longest(i))) {
+            cnt = 1;
+        }
+        if (i >= 1) {
+            if (len == mana.get_longest(i, false)) {
+                cnt++;
+            } else if (maximize(len, mana.get_longest(i, false))) {
+                cnt = 1;
+            }
+        }
+    } 
+    cout << len << " " << cnt << nline;
 }
 
 int main() {
