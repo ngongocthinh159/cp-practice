@@ -115,63 +115,55 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 #define MAXN 505
 #define MAXK 500005
 #define MAXP 10
+#define left __left
+#define right __right
 #define pii pair<int,int>
-int n, k, r, p, a[MAXN][MAXN], x[MAXK][MAXP], y[MAXK][MAXP];
+int n, k, r, p, a[MAXN][MAXN], top[MAXP], bot[MAXP], left[MAXP], right[MAXP];
 ll pref[MAXN][MAXN];
 void pre_compute() {
     
 }
-ll query(int x1, int y1, int x2, int y2) {
-    x1++, y1++, x2++, y2++;
-    return pref[x2][y2] - pref[x2][y1 - 1] - pref[x1 - 1][y2] + pref[x1 - 1][y1 - 1];
-}
-pii _inter(int l1, int r1, int l2, int r2) {
-    if (r2 < l1 || r1 < l2) return {-1, -1};
-    return {max(l1, l2), min(r1, r2)};
-}
-pair<pii,pii> inter(pair<pii,pii> &rec1, pair<pii,pii> &rec2) {
-    if (rec1.first.first == -1 || rec2.first.first == -1) return {{-1,-1},{-1,-1}};
-    int x11 = rec1.first.first, x12 = rec1.second.first;
-    int x21 = rec2.first.first, x22 = rec2.second.first;
-    int y11 = rec1.first.second, y12 = rec1.second.second;
-    int y21 = rec2.first.second, y22 = rec2.second.second;
-
-    pii res1 = _inter(x11, x12, x21, x22);
-    if (res1.first == -1) return {{-1,-1},{-1,-1}};
-    pii res2 = _inter(y11, y12, y21, y22);
-    if (res2.first == -1) return {{-1,-1},{-1,-1}};
-    return {{res1.first, res2.first}, {res1.second, res2.second}};
+ll query(int t, int b, int l, int r) {
+    if (t > b || l > r) return 0;
+    return pref[b][r] - pref[b][l - 1] - pref[t - 1][r] + pref[t - 1][l - 1];
 }
 ll F(int k) {
     ll res = 0;
     for (int mask = 1; mask < MASK(p); mask++) {
-        pair<pii,pii> cur = {{0, 0}, {n - 1, n - 1}};
+        int t = 1, b = n, l = 1, r = n;
         int len = 0;
         for (int bit = p - 1; bit >= 0; bit--) {
             if ((mask >> bit) & 1) {
                 len++;
-                pair<pii,pii> rec = {{x[k][bit], y[k][bit]}, {min(x[k][bit] + r - 1,n-1), min(y[k][bit] + r - 1,n-1)}};
-                cur = inter(cur, rec);
+                t = max(t, top[bit]);
+                b = min(b, bot[bit]);
+                l = max(l, left[bit]);
+                r = min(r, right[bit]);
             }
         }
-        if (cur.first.first != -1 && cur.second.second != -1) {
-            int sign = len&1 ? 1 : -1;
-            res += query(cur.first.first, cur.first.second, cur.second.first, cur.second.second)*sign;
-        }
+        int sign = len&1 ? 1 : -1;
+        res += query(t, b, l, r)*sign;
     }
     return res;
 }
 void solve() {
     cin >> n >> k >> r >> p;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-    for (int i = 0; i < k; i++)
-        for (int j = 0; j < p; j++) cin >> x[i][j] >> y[i][j], x[i][j]--, y[i][j]--;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            pref[i + 1][j + 1] = pref[i][j + 1] + pref[i + 1][j] - pref[i][j] + a[i][j];
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) cin >> a[i][j];
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            pref[i][j] = pref[i - 1][j] + pref[i][j - 1] - pref[i - 1][j - 1] + a[i][j];
     ll ans = 0;
-    for (int i = 0; i < k; i++) ans = max(ans, F(i));
+    for (int i = 0; i < k; i++) {
+        for (int j = 0; j < p; j++) {
+            cin >> top[j];
+            bot[j] = top[j] + r - 1;
+            
+            cin >> left[j]; 
+            right[j] = left[j] + r - 1;
+        }
+        ans = max(ans, F(i));
+    }
     cout << ans << nline;
 }
 
