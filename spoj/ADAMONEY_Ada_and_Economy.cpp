@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://www.spoj.com/problems/ADAMONEY/
 */
 
 #include<bits/stdc++.h>
