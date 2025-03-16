@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_m
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_a
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -112,29 +112,21 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-#define MAXN 105
-#define MAXK 100005
-int n, k, a[MAXN];
-ll dp[MAXN][MAXK], pref[MAXN][MAXK]; // dp[i][j]: so cach chia keo cho i children dau tien, neu hien tai da su dung j vien keo
 
+#define MAXN 100005
+int n, a[MAXN];
+ll dp[MAXN];
 void pre_compute() {
-    
+
 }
 void solve() {
-    cin >> n >> k;
+    cin >> n;
     for (int i = 1; i <= n; i++) cin >> a[i];
-    for (int i = 0; i <= k; i++) pref[0][i + 1] = 1;
-    for (int i = 1; i <= n + 1; i++) {
-        for (int j = 0; j <= k; j++) {
-            int l = j - min(a[i], j);
-            int r = j;
-            dp[i][j] = (dp[i][j] + pref[i - 1][r + 1]) % MOD;
-            dp[i][j] = (dp[i][j] - pref[i - 1][l]) % MOD;
-            if (dp[i][j] < 0) dp[i][j] += MOD;
-            pref[i][j + 1] = (dp[i][j] + pref[i][j]) % MOD;
-        }
+    for (int i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + abs(a[i] - a[i - 1]);
+        if (i - 2 >= 1) minimize(dp[i], dp[i - 2] + abs(a[i] - a[i - 2]));
     }
-    cout << dp[n][k] << nline;
+    cout << dp[n] << nline;
 }
 
 int main() {

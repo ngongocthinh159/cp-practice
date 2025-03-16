@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_i
+ * Solution for: 
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -21,20 +21,27 @@ freopen("Output.txt", "w", stdout);
 }
 #define MOD 1000000007
 #define MOD1 998244353
-#define INF 1e18
+#define LINF ((long long)1e18)
+#define IINF ((int)1e9)
 #define nline "\n"
 #define pb push_back
 #define ppb pop_back
 #define mp make_pair
-#define ff first
-#define ss second
+#define fi first
+#define se second
 #define PI 3.141592653589793238462
-#define set_bits(x) __builtin_popcountll(x)
-#define sz(x) ((int)(x).size())
-#define all(x) (x).begin(), (x).end()
+#define SET_BITS(x) __builtin_popcountll(x)
+#define MASK(i) (1LL << (i))
+#define BIT(x, i) (((x) >> (i)) & 1)
+#define SZ(x) ((int)(x).size())
+#define ALL(v) (v).begin(), (v).end()
+#define FOR(i, a, b) for (int i = (a), _b = (b); i <= _b; i++)
+#define FORD(i, b, a) for (int i = (b), _a = (a); i >= _a; i--)
+#define REP(i, n) for (int i = 0, _n = (n); i < _n; i++)
+#define FORE(i, v) for (__typeof((v).begin()) i = (v).begin(); i != (v).end(); i++)
 
-// #define ThinhNgo
-#ifdef ThinhNgo
+// #define ThinhNgo_debug
+#ifdef ThinhNgo_debug
 #define debug(x) cerr << #x<<" "; _print(x); cerr << endl;
 #else
 #define debug(x);
@@ -45,6 +52,21 @@ using ull = unsigned long long;
 using lld = long double;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
  
+template<class X, class Y>
+    bool minimize(X &x, const Y &y) {
+        if (x > y) {
+            x = y;
+            return true;
+        } else return false;
+    }
+template<class X, class Y>
+    bool maximize(X &x, const Y &y) {
+        if (x < y) {
+            x = y;
+            return true;
+        } else return false;
+    }
+
 void _print(ll t) {cerr << t;}
 void _print(int t) {cerr << t;}
 void _print(string t) {cerr << t;}
@@ -58,7 +80,7 @@ template <class T> void _print(vector <T> v);
 template <class T> void _print(set <T> v);
 template <class T, class V> void _print(map <T, V> v);
 template <class T> void _print(multiset <T> v);
-template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.ff); cerr << ","; _print(p.ss); cerr << "}";}
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.fi); cerr << ","; _print(p.se); cerr << "}";}
 template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
 template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
@@ -71,9 +93,9 @@ ll __gcd__(ll a, ll b) {if (!a || !b) return a | b; unsigned shift = __builtin_c
 ll gcd(ll a, ll b) {a = abs(a); b = abs(b); return __gcd__(a, b);} // get abs(a), abs(b) in case a < 0 || b < 0
 ll expo(ll a, ll b, ll mod) {if (a==0) return 1%mod; ll res = 1; while (b > 0) {if (b & 1)res = (res * a) % mod; a = (a * a) % mod; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
 ll expo(ll a, ll b) {ll res = 1; while (b > 0) {if (b & 1)res = res * a; a = a * a; b = b >> 1;} return res;} // a = 0 return 0 | b = 0 return 1
-void extendgcd(ll a, ll b, ll*v) {if (b == 0) {v[0] = 1; v[1] = 0; v[2] = a; return ;} extendgcd(b, a % b, v); ll x = v[1]; v[1] = v[0] - v[1] * (a / b); v[0] = x; return;} //pass an arry of size1 3
-ll mminv(ll a, ll b) {ll arr[3]; extendgcd(a, b, arr); return arr[0];} //for non prime b
-ll mminvprime(ll a, ll b) {assert(gcd(a, b) == 1); return expo(a, b - 2, b);} // inverse mod: a^-1 % b = a^(b-2) % b. When gcd(a,b)=1 (or b prime)
+void extendgcd(ll a, ll b, ll*v) {if (b == 0) {v[0] = 1; v[1] = 0; v[2] = a; return ;} extendgcd(b, a % b, v); ll x = v[1]; v[1] = v[0] - v[1] * (a / b); v[0] = x; return;} //pass an arry of size1 3, calculate modular invese a^-1 % b, only work with a and b coprime
+ll modinv(ll a, ll m) {ll arr[3]; extendgcd(a, m, arr); return arr[0];} // inverse mod: a^-1 % m for non prime m, and gcd(a,m)=1
+ll modinvprime(ll a, ll m) {assert(gcd(a, m) == 1); return expo(a, m - 2, m);} // inverse mod: a^-1 % m = a^(m-2) % m. When gcd(a,m)=1 and m prime
 bool revsort(ll a, ll b) {return a > b;}
 ll combination(ll n, ll r, ll m, ll *fact, ll *ifact) {ll val1 = fact[n]; ll val2 = ifact[n - r]; ll val3 = ifact[r]; return (((val1 * val2) % m) * val3) % m;}
 void google(int t) {cout << "Case #" << t << ": ";}
@@ -81,38 +103,33 @@ vector<ll> sieve(int n) {int*arr = new int[n + 1](); vector<ll> vect; for (int i
 ll mod_add(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a + b) % m) + m) % m;}
 ll mod_mul(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a * b) % m) + m) % m;}
 ll mod_sub(ll a, ll b, ll m) {a = a % m; b = b % m; return (((a - b) % m) + m) % m;}
-ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, mminvprime(b, m), m) + m) % m;}  //only for prime m
+ll mod_div(ll a, ll b, ll m) {a = a % m; b = b % m; return (mod_mul(a, modinvprime(b, m), m) + m) % m;}  //only for prime m
 ll phin(ll n) {ll number = n; if (n % 2 == 0) {number /= 2; while (n % 2 == 0) n /= 2;} for (ll i = 3; i <= sqrt(n); i += 2) {if (n % i == 0) {while (n % i == 0)n /= i; number = (number / i * (i - 1));}} if (n > 1)number = (number / n * (n - 1)) ; return number;} //O(sqrt(N))
-ll getRandomNumber(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
+ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);} 
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
-
-
-const int mxn = 3e3 + 5;
+#define MAXN 3005
 int n;
-double p[mxn];
-double dp[mxn][mxn]; // total propabilities of the first i coins that have exactly j head
+double p[MAXN], dp[MAXN][MAXN];
+
 void pre_compute() {
 
 }
 void solve() {
     cin >> n;
-    for (int i = 0; i < n; i++) cin >> p[i];
-    dp[1][1] = p[0];
-    dp[1][0] = 1 - p[0];
-    for (int i = 3; i <= n; i += 2) {
-        for (int j = 0; j <= n; j++) {
-            dp[i][j] = dp[i - 2][j]*(1.00 - p[i - 1])*(1.00 - p[i - 2]);
-            if (j - 1 >= 0) dp[i][j] += dp[i - 2][j - 1] * (p[i - 1]*(1.00 - p[i - 2]) + (1.00 - p[i - 1])*p[i - 2]);
-            if (j - 2 >= 0) dp[i][j] += dp[i - 2][j - 2] * p[i - 1] * p[i - 2];
+    for (int i = 1; i <= n; i++) cin >> p[i];
+    dp[0][0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int j = 0; j <= i; j++) {
+            dp[i][j] = dp[i - 1][j] * (1.00 - p[i]);
+            if (j - 1 >= 0) dp[i][j] += dp[i - 1][j - 1] * p[i];
         }
-    }
-    double ans = 0.0;
+    double ans = 0;
     for (int j = (n + 1)/2; j <= n; j++) ans += dp[n][j];
-    printf("%.10f\n", ans);
+    printf("%.12f", ans);
 }
 
 int main() {
