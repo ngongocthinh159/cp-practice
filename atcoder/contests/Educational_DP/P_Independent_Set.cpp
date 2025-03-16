@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_o
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_p
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -112,28 +112,39 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-#define MAXN 21
-int n, a[MAXN][MAXN];
-ll dp[1 << MAXN];
+#define MAXN 100005
+int n;
+ll dp[MAXN][2];
+vector<int> g[MAXN];
 
 void pre_compute() {
 
 }
-ll dfs(int state) {
-    if (state == (1 << n) - 1) return 1;
-    if (dp[state] != -1) return dp[state];
-    ll res = 0;
-    int i = __builtin_popcount(state);
-    for (int j = 0; j < n; j++) if (a[i][j] && !((state >> j) & 1))
-        res = (res + dfs(state | (1 << j))) % MOD;
-    return dp[state] = res;
+ll dfs(int u, int color, int par) {
+    if (g[u].size() == 1 && g[u][0] == par) return 1;
+    if (dp[u][color] != -1) return dp[u][color];
+    ll res = 1;
+    for (auto v : g[u]) if (v != par) {
+        ll cur = dfs(v, color^1, u);
+        if (color == 0) cur = (cur + dfs(v, color, u)) % MOD;
+        res = res * cur % MOD;
+    }
+    return dp[u][color] = res;
 }
 void solve() {
     cin >> n;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-    for (int i = 0; i < (1 << n); i++) dp[i] = -1;
-    cout << dfs(0) << nline;
+    for (int i = 0; i < n - 1; i++) {
+        int u, v; cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    if (n == 1) {
+        cout << 2 << nline;
+        return;
+    }
+    for (int i = 0; i <= n; i++)
+        for (int j = 0; j < 2; j++) dp[i][j] = -1;
+    cout << (dfs(1, 0, -1) + dfs(1, 1, -1)) % MOD << nline;
 }
 
 int main() {

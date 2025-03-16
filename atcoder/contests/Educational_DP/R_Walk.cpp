@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_o
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_r
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -112,28 +112,41 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-#define MAXN 21
+#define MAXN 55
 int n, a[MAXN][MAXN];
-ll dp[1 << MAXN];
+ll K, cur[MAXN][MAXN], res[MAXN][MAXN], buf[MAXN][MAXN];
 
 void pre_compute() {
 
 }
-ll dfs(int state) {
-    if (state == (1 << n) - 1) return 1;
-    if (dp[state] != -1) return dp[state];
-    ll res = 0;
-    int i = __builtin_popcount(state);
-    for (int j = 0; j < n; j++) if (a[i][j] && !((state >> j) & 1))
-        res = (res + dfs(state | (1 << j))) % MOD;
-    return dp[state] = res;
+void mul(ll a[MAXN][MAXN], ll b[MAXN][MAXN], ll buf[MAXN][MAXN]) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) buf[i][j] = 0;
+    for (int i = 0; i < n; i++)
+        for (int k = 0; k < n; k++)
+            for (int j = 0; j < n; j++)
+                buf[i][j] = (buf[i][j] + a[i][k] * b[k][j] % MOD) % MOD;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) a[i][j] = buf[i][j];
 }
 void solve() {
-    cin >> n;
+    cin >> n >> K;
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) cin >> a[i][j];
-    for (int i = 0; i < (1 << n); i++) dp[i] = -1;
-    cout << dfs(0) << nline;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) if (a[i][j]) cur[i][j] = 1;
+    for (int i = 0; i < n; i++) 
+        res[i][i] = 1;
+    while (K) {
+        if (K&1)
+            mul(res, cur, buf);
+        mul(cur, cur, buf);
+        K >>= 1;
+    }
+    ll ans = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) ans = (ans + res[i][j]) % MOD;
+    cout << ans << nline;
 }
 
 int main() {

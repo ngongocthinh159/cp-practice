@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_o
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_q
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -112,28 +112,52 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-#define MAXN 21
-int n, a[MAXN][MAXN];
-ll dp[1 << MAXN];
+#define MAXN 200005
+int n, a[MAXN], h[MAXN];
+struct Data {
+    ll mx;
+};
+Data segtree[4*MAXN];
+Data merge(Data &l, Data &r) {
+    Data res;
+    res.mx = max(l.mx, r.mx);
+    return res;
+}
+void update(int idx, int s, int e, int pos, ll val) {
+    if (s == e) {
+        segtree[idx].mx = max(segtree[idx].mx, val);
+        return;
+    };
+    int m = (s + e)/2;
+    if (pos <= m)
+        update(2*idx, s, m, pos, val);
+    else
+        update(2*idx + 1, m + 1, e, pos, val);
+    segtree[idx].mx = max(segtree[2*idx].mx, segtree[2*idx + 1].mx);
+}
+ll query_mx(int idx, int s, int e, int l, int r) {
+    if (r < s || e < l) return -IINF;
+    if (l <= s && e <= r) return segtree[idx].mx;
+    int m = (s + e)/2;
+    ll la = query_mx(2*idx, s, m, l, r);
+    ll lr = query_mx(2*idx + 1, m + 1, e, l, r);
+    return max(la, lr);
+}
 
 void pre_compute() {
 
 }
-ll dfs(int state) {
-    if (state == (1 << n) - 1) return 1;
-    if (dp[state] != -1) return dp[state];
-    ll res = 0;
-    int i = __builtin_popcount(state);
-    for (int j = 0; j < n; j++) if (a[i][j] && !((state >> j) & 1))
-        res = (res + dfs(state | (1 << j))) % MOD;
-    return dp[state] = res;
-}
 void solve() {
     cin >> n;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-    for (int i = 0; i < (1 << n); i++) dp[i] = -1;
-    cout << dfs(0) << nline;
+    for (int i = 0; i < n; i++) cin >> h[i];
+    for (int i = 0; i < n; i++) cin >> a[i];
+    ll ans = 0;
+    for (int i = 0; i < n; i++) {
+        ll mx_val = query_mx(1, 0, n, 0, h[i] - 1);
+        update(1, 0, n, h[i], mx_val + a[i]);
+        ans = max(ans, mx_val + a[i]);
+    }
+    cout << ans << nline;
 }
 
 int main() {

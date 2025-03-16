@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_o
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_n
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -112,28 +112,27 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 // #define ThinhNgo_use_cases
 
 
-#define MAXN 21
-int n, a[MAXN][MAXN];
-ll dp[1 << MAXN];
-
+#define MAXN 405
+int n, a[MAXN], tot;
+ll dp[MAXN][MAXN], pref[MAXN];
 void pre_compute() {
 
 }
-ll dfs(int state) {
-    if (state == (1 << n) - 1) return 1;
-    if (dp[state] != -1) return dp[state];
-    ll res = 0;
-    int i = __builtin_popcount(state);
-    for (int j = 0; j < n; j++) if (a[i][j] && !((state >> j) & 1))
-        res = (res + dfs(state | (1 << j))) % MOD;
-    return dp[state] = res;
+ll dfs(int l, int r) {
+    if (l == r) return 0;
+    if (dp[l][r] != -1) return dp[l][r];
+    ll res = LINF;
+    for (int i = l; i < r; i++) {
+        res = min(res, pref[r + 1] - pref[l] + dfs(l, i) + dfs(i + 1, r)); // the last merge will decide the boundary of left and right merging, we brute force on this boundary
+    }
+    return dp[l][r] = res;
 }
 void solve() {
     cin >> n;
+    for (int i = 0; i < n; i++) cin >> a[i], pref[i + 1] = a[i] + pref[i];
     for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-    for (int i = 0; i < (1 << n); i++) dp[i] = -1;
-    cout << dfs(0) << nline;
+        for (int j = 0; j < n; j++) dp[i][j] = -1;
+    cout << dfs(0, n - 1) << nline;
 }
 
 int main() {
