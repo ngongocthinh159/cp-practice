@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://atcoder.jp/contests/dp/tasks/dp_v
+ * Solution for: https://atcoder.jp/contests/dp/tasks/dp_t
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -111,59 +111,30 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 /*--------------------------------------------------------------------------------------------------------------------------*/
 // #define ThinhNgo_use_cases
 
-// reference: https://oj.vnoi.info/problem/atcoder_dp_v/editorial
 
-#define MAXN 100005
-int n, m;
-vector<int> g[MAXN];
-ll in[MAXN], out[MAXN], pref[MAXN], surf[MAXN];
+#define MAXN 3005
+int n;
+string s;
+ll dp[MAXN][MAXN], pref[MAXN][MAXN];
+
 void pre_compute() {
 
 }
-void dfs(int u, int par) {
-    in[u] = 1;
-    for (auto v : g[u]) if (v != par) {
-        dfs(v, u);
-        in[u] = in[u] * in[v] % m;
-    }
-    in[u] = (in[u] + 1) % m;
-}
-void dfs2(int u, int par) {
-    vector<int> child;
-    for (auto v : g[u]) if (par != v) 
-        child.push_back(v);
-    int K = SZ(child);
-    pref[0] = surf[K + 1] = 1;
-    for (int i = 0; i < K; i++) {
-        int v = child[i];
-        pref[i + 1] = (pref[i] * in[v]) % m;
-    }
-    for (int i = K - 1; i >= 0; i--) {
-        int v = child[i];
-        surf[i + 1] = (surf[i + 2] * in[v]) % m;
-    }
-    for (int i = 0; i < K; i++) {
-        int v = child[i];
-        out[v] = out[u] * pref[i] % m;
-        out[v] = out[v] * surf[i + 2] % m;
-        out[v] = (out[v] + 1) % m;
-    }
-    for (auto v : child)
-        dfs2(v, u);
-}
 void solve() {
-    cin >> n >> m;
-    for (int i = 0; i < n - 1; i++) {
-        int u, v; cin >> u >> v;
-        g[u].push_back(v);
-        g[v].push_back(u);
+    cin >> n >> s;
+    pref[0][2] = 1;
+    for (int i = 1; i < n; ++i) {
+        for (int j = 1; j <= i + 1; j++) {
+            if (s[i - 1] == '>')
+                dp[i][j] = ((pref[i - 1][i + 1] - pref[i - 1][j]) % MOD + MOD) % MOD;
+            else
+                dp[i][j] = pref[i - 1][j];
+            pref[i][j + 1] = (pref[i][j] + dp[i][j]) % MOD;
+        }   
     }
-    dfs(1, -1);
-    out[1] = 1;
-    dfs2(1, -1);
-    for (int i = 1; i <= n; i++) {
-        cout << ((in[i] - 1 + m) * out[i] % m) << nline; 
-    }
+    ll ans = 0;
+    for (int j = 1; j <= n; j++) ans = (ans + dp[n - 1][j]) % MOD;
+    cout << ans << nline;
 }
 
 int main() {
