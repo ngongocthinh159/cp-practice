@@ -6,6 +6,9 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+#define nline '\n'
+#define ll long long
+
 #define fastio() ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 void IN_OUT() {
 #ifndef ONLINE_JUDGE
