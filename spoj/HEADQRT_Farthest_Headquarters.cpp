@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://www.spoj.com/problems/HEADQRT/
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -109,15 +109,104 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
+#define ThinhNgo_use_cases
 
 
+const double EPS = 1e-9;
+int cmpf(double x, double y) {
+    if (x > y + EPS) return 1;
+    if (x < y - EPS) return -1;
+    return 0;
+}
+struct Point {
+    double x, y;
+    Point(double _x, double _y) : x(_x), y(_y) {}
 
+    int cmp(const Point& q) const {
+        int res_x = cmpf(x, q.x);
+        if (res_x != 0) return res_x;
+        return cmpf(y, q.y);
+    }
+
+    #define op(X) Point operator X (const Point& q) const { return Point(x X q.x, y X q.y); }
+    op(+) op(-)
+    #undef op
+
+    #define op(X) bool operator X (const Point& q) const { return cmp(q) X 0; }
+    op(>) op(<) op(>=) op(<=) op(!=) op(==)
+    #undef op
+
+    double len() {
+        return sqrt(x*x + y*y);
+    }    
+
+    double cross(const Point& q) const {
+        return x * q.y - q.x * y;
+    }
+};
+int ccw(const Point& A, const Point& B, const Point& C) {
+    return cmpf((B - A).cross(C - A), 0);
+}
+void convexHull(vector<Point> &p, vector<Point> &up, vector<Point>& dw) {
+    sort(p.begin(), p.end());
+    p.erase(unique(p.begin(), p.end()), p.end());
+    int n = p.size();
+    for (int i = 0; i < n; i++) {
+        while (up.size() >= 2 && ccw(up[up.size() - 2], up[up.size() - 1], p[i]) >= 0)
+            up.pop_back();
+        up.push_back(p[i]);
+        while (dw.size() >= 2 && ccw(dw[dw.size() - 2], dw[dw.size() - 1], p[i]) <= 0)
+            dw.pop_back();
+        dw.push_back(p[i]);
+    }
+}
+
+int n;
 
 void pre_compute() {
 
 }
+double dist(const Point& P, vector<Point>& ps) {
+    int l = -1, r = ps.size();
+    while (r - l > 2) {
+        int m1 = l + (r - l)/3;
+        int m2 = r - (r - l)/3;
+        double f1 = (P - ps[m1]).len();
+        double f2 = (P - ps[m2]).len();
+        if (f1 <= f2)
+            l = m1;
+        else
+            r = m2;
+    }
+    double res = DBL_MIN;
+    for (int j = max(0, l); j <= min((int) ps.size() - 1, r); j++) res = max(res, (P - ps[j]).len());
+    return res;
+}
 void solve() {
-
+    cin >> n;
+    vector<Point> p1, p2;
+    for (int i = 0; i < n; i++) {
+        double x, y;
+        int t; cin >> x >> y >> t;
+        if (!t)
+            p1.push_back(Point(x, y));
+        else
+            p2.push_back(Point(x, y));
+    }
+    double ans = DBL_MIN;
+    if (p1.size() < 3 || p2.size() < 3) {
+        for (auto &_p1 : p1)
+            for (auto &_p2 : p2) ans = max(ans, (_p2 - _p1).len());
+    } else {
+        vector<Point> up, dw;
+        convexHull(p2, up, dw);
+        for (int i = 0; i < (int) p1.size(); i++) {
+            ans = max(ans, dist(p1[i], up));
+            ans = max(ans, dist(p1[i], dw));
+        }
+    }
+    long long res = ans;
+    cout << res << nline;
 }
 
 int main() {
@@ -127,15 +216,14 @@ int main() {
     fastio();
     IN_OUT();
     auto start1 = high_resolution_clock::now();
-    
+    int T = 1;
+#ifdef ThinhNgo_use_cases
+    cin >> T;
+#endif
     pre_compute();
-    int T; 
-    // cin >> T;
-    for (int cases = 1; cases <= T; cases++) {
-
+    while (T--) {
         solve();
     }
-    
     auto stop1 = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop1 - start1);
 #ifdef ThinhNgo

@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://acm.timus.ru/problem.aspx?space=1&num=1185
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -109,15 +109,96 @@ ll randint(ll l, ll r) {return uniform_int_distribution<ll>(l, r)(rng);}
 struct custom_hash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
+// #define ThinhNgo_use_cases
+
+const double EPS = 1e-9;
+int cmp(double x, double y) {
+    if (x > y + EPS) return 1;
+    if (x < y - EPS) return -1;
+    return 0;
+}
+
+struct Point {
+    double x, y;
+    
+    Point(double _x = 0, double _y = 0) : x(_x), y(_y) {}
+
+    int cmp(const Point& q) const {
+        int res_x = ::cmp(x, q.x);
+        if (res_x != 0) return res_x;
+        return ::cmp(y, q.y);
+    }
+
+    #define op(X) Point operator X (const Point& q) const { return Point(x X q.x, y X q.y); }
+    op(+) op(-)
+    #undef op
+
+    #define op(X) Point operator X (double k) const { return Point(x X k, y X k); }
+    op(*) op(/)
+    #undef op
+
+    #define op(X) bool operator X (const Point& q) const { return cmp(q) X 0; }
+    op(>) op(<) op(>=) op(<=) op(!=) op(==)
+    #undef op
+
+    double cross(const Point& q) const {
+        return x * q.y - q.x * y;
+    }
+    
+    double dot(const Point& q) const {
+        return x * q.x + y * q.y;
+    }
+
+    double len() {
+        return sqrt(x * x + y * y);
+    }
+};
 
 
+int ccw(const Point& A, const Point& B, const Point& C) {
+    return cmp((B - A).cross(C - A), 0);
+}
 
+void convexHull(vector<Point> &p) {
+    sort(p.begin(), p.end());
+    p.erase(unique(p.begin(), p.end()), p.end());
 
+    int n = p.size();
+    vector<Point> up, dw;
+    for (int i = 0; i < n; i++) {
+        while (up.size() >= 2 && ccw(up[up.size() - 2], up[up.size() - 1], p[i]) >= 0)
+            up.pop_back();
+        up.push_back(p[i]);
+        while (dw.size() >= 2 && ccw(dw[dw.size() - 2], dw[dw.size() - 1], p[i]) <= 0)
+            dw.pop_back();
+        dw.push_back(p[i]);
+    }
+    p = dw;
+    for (int i = (int) up.size() - 2; i > 0; i--) 
+        p.push_back(up[i]);
+}
+
+int n;
+double L;
+
+double perimeter(vector<Point>& p) {
+    double res = 0;
+    int m = p.size();
+    for (int i = 0; i < m; i++) res += (p[(i+1) % m] - p[i]).len();
+    return res;
+}
 void pre_compute() {
 
 }
 void solve() {
-
+    cin >> n >> L;
+    vector<Point> p(n);
+    for (int i = 0; i < n; i++) {
+        cin >> p[i].x >> p[i].y;
+    }
+    vector<Point> hull = p;
+    convexHull(hull);
+    printf("%.0f\n", perimeter(hull) + 2 * PI * L);
 }
 
 int main() {
@@ -127,15 +208,14 @@ int main() {
     fastio();
     IN_OUT();
     auto start1 = high_resolution_clock::now();
-    
+    int T = 1;
+#ifdef ThinhNgo_use_cases
+    cin >> T;
+#endif
     pre_compute();
-    int T; 
-    // cin >> T;
-    for (int cases = 1; cases <= T; cases++) {
-
+    while (T--) {
         solve();
     }
-    
     auto stop1 = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop1 - start1);
 #ifdef ThinhNgo
