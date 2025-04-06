@@ -33,7 +33,7 @@ void solve() {
 int main() {
     fastio();
     IN_OUT();
-    int T; 
+    int T = 1;
     // cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {

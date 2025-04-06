@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://www.codechef.com/problems/QRYLAND?tab=statement
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -111,12 +111,119 @@ struct custom_hash_pair {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b9
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
 
+#define N 250005
+int n, q, T = -1;
+int big[N], chain[N], sz[N], par[N], depth[N], pos[N];
+int segtree[4*N], mapped[N], phash[N], euler[N], val[N];
+vector<int> g[N];
 
+void build(int idx, int s, int e, int *arr) {
+    if (s == e) {
+        segtree[idx] = arr[s];
+        return;
+    }
+    int m = (s + e)/2;
+    build(2*idx, s, m, arr);
+    build(2*idx + 1, m + 1, e, arr);
+    segtree[idx] = segtree[2*idx] ^ segtree[2*idx + 1];
+}
+void update(int idx, int s, int e, int pos, int val) {
+    if (s == e) {
+        segtree[idx] = val;
+        return;
+    }
+    int m = (s + e)/2;
+    if (pos <= m)
+        update(2*idx, s, m, pos, val);
+    else 
+        update(2*idx + 1, m + 1, e, pos, val);
+    segtree[idx] = segtree[2*idx] ^ segtree[2*idx + 1];
+}
+ll query(int idx, int s, int e, int l, int r) {
+    if (s > r || l > e || s > e || l > r) return 0;
+    if (l <= s && e <= r) return segtree[idx];
+    int m = (s + e)/2;
+    return query(2*idx, s, m, l, r) ^ query(2*idx + 1, m + 1, e, l, r);
+}
+
+void dfs_sz(int u, int p) {
+    sz[u] = 1;
+    big[u] = -1;
+    int mxc = 0;
+    for (auto v : g[u]) if (v != p) {
+        depth[v] = depth[u] + 1;
+        par[v] = u;
+        dfs_sz(v, u);
+        sz[u] += sz[v];
+        if (mxc < sz[v]) 
+            mxc = sz[v], big[u] = v;
+    }
+}
+void dfs_chain(int u, int p, int top) {
+    chain[u] = top;
+    euler[++T] = val[u];
+    pos[u] = T;
+    if (big[u] != -1) 
+        dfs_chain(big[u], u, top);
+    for (auto v : g[u]) if (v != p && v != big[u])
+        dfs_chain(v, u, v);
+}
+bool query_hld(int u, int v) {
+    int L = depth[v] + depth[u];
+
+    ll cur = 0;
+    while (chain[u] != chain[v]) {
+        if (depth[chain[u]] < depth[chain[v]]) swap(u, v);
+        cur ^= query(1, 0, n - 1, pos[chain[u]], pos[u]);
+        u = par[chain[u]];
+    }
+    if (depth[u] > depth[v]) swap(u, v);
+    cur ^= query(1, 0, n - 1, pos[u], pos[v]);
+
+    L = L - 2*depth[u] + 1;
+    return cur == phash[L];
+}
 
 void pre_compute() {
 
 }
 void solve() {
+    cin >> n >> q;
+    for (int i = 1; i <= n; i++) {
+        // mapping number from 1 -> N to random number from 1 -> 1e9
+        // then calculate prefix hash [1->N] as xor of prefix mapped numbers
+        mapped[i] = randint(1, (int) 1e9);
+        phash[i] = phash[i - 1] ^ mapped[i];
+    }
+    for (int i = 1; i <= n; i++) {
+        int x; cin >> x;
+        val[i] = mapped[x];
+    }
+    for (int i = 0; i < n - 1; i++) {
+        int u, v; cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    dfs_sz(1, -1);
+    dfs_chain(1, -1, 1);
+    build(1, 0, n - 1, euler);
+    int t, x, y, z;
+    for (int i = 0; i < q; i++) {
+        cin >> t;
+        if (t == 1) {
+            cin >> x >> y;
+            if (query_hld(x, y))
+                cout << "Yes" << nline;
+            else
+                cout << "No" << nline;
+        } else {
+            cin >> x >> z;
+            update(1, 0, n - 1, pos[x], mapped[z]);
+        }
+    }
+
+    T = -1;
+    for (int i = 1; i <= n; i++) g[i].clear();
 
 }
 
@@ -130,7 +237,7 @@ int main() {
     
     pre_compute();
     int T = 1;
-    // cin >> T;
+    cin >> T;
     for (int cases = 1; cases <= T; cases++) {
 
         solve();
