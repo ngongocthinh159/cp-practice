@@ -39,6 +39,8 @@ void dijkstra(int src, vector<int> &opt) {
     while (q.size()) {
         auto [w_u, u] = q.top();
         q.pop();
+        if (w_u > opt[u]) 
+            continue;
         for (auto i : g[u]) {
             int v = e[i].u ^ e[i].v ^ u;
             int w_uv = e[i].w;
