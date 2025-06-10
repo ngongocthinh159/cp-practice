@@ -53,19 +53,19 @@ using lld = long double;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update > pbds; // find_by_order, order_of_key
  
 template<class X, class Y>
-    bool minimize(X &x, const Y &y) {
-        if (x > y) {
-            x = y;
-            return true;
-        } else return false;
-    }
+bool minimize(X &x, const Y &y) {
+    if (x > y) {
+        x = y;
+        return true;
+    } else return false;
+}
 template<class X, class Y>
-    bool maximize(X &x, const Y &y) {
-        if (x < y) {
-            x = y;
-            return true;
-        } else return false;
-    }
+bool maximize(X &x, const Y &y) {
+    if (x < y) {
+        x = y;
+        return true;
+    } else return false;
+}
 
 void _print(ll t) {cerr << t;}
 void _print(int t) {cerr << t;}
