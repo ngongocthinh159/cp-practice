@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc410/tasks/abc410_c
 */
 
 #include<bits/stdc++.h>
@@ -45,7 +45,26 @@ void pre_compute() {
     
 }
 void solve() {
-
+    int n, q;
+    cin >> n >> q;
+    int a[1000005];
+    for (int i = 0; i < n; i++) a[i] = i + 1;
+    int k = 0;
+    for (int i = 0; i < q; i++) {
+        int t; cin >> t;
+        if (t == 1) {
+            int p, x; cin >> p >> x;
+            int idx = (p - 1 + k) % n;
+            a[idx] = x;
+        } else if (t == 2) {
+            int p; cin >> p;
+            int idx = (p - 1 + k) % n;
+            cout << a[idx] << nline;
+        } else {
+            int p; cin >> p;
+            k = (k + p) % n;
+        }
+    }
 }
 
 int main() {

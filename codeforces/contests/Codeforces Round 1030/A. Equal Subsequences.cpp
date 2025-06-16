@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2118/problem/A
 */
 
 #include<bits/stdc++.h>
@@ -45,14 +45,19 @@ void pre_compute() {
     
 }
 void solve() {
-
+    int n, k;
+    cin >> n >> k;
+    string res = "";
+    for (int i = 0; i < k; i++) res += '1';
+    while (res.size() < n) res+= '0';
+    cout << res << nline;
 }
 
 int main() {
     fastio();
     IN_OUT();
     int T = 1;
-    // cin >> T;
+    cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {
 

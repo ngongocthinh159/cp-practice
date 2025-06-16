@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2113/problem/C
 */
 
 #include<bits/stdc++.h>
@@ -40,19 +40,46 @@ struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x 
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
+#define N 505
+int n, m, k;
 
+char grid[N][N];
+int pref[N][N];
 void pre_compute() {
     
 }
 void solve() {
-
+    cin >> n >> m >> k;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) {
+            cin >> grid[i][j];
+            pref[i + 1][j + 1] = pref[i + 1][j] + pref[i][j + 1] - pref[i][j] + (grid[i][j] == 'g');
+        }
+    auto query = [&](int x1, int y1, int x2, int y2) {
+        return pref[x2 + 1][y2 + 1] - pref[x2 + 1][y1] - pref[x1][y2 + 1] + pref[x1][y1];
+    };
+    int tot = query(0, 0, n - 1, m - 1);
+    int mn = IINF;
+    for (int i = 0; i < n; i++) 
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == '.') {
+                int len = k;
+                int x1 = max(0, i - len + 1);
+                int y1 = max(0, j - len + 1);
+                int x2 = min(n - 1, i + len - 1);
+                int y2 = min(m - 1, j + len - 1);
+                mn = min(mn, query(x1, y1, x2, y2));
+            }
+        }
+    // cout << mn << nline;
+    cout << tot - mn << nline;
 }
 
 int main() {
     fastio();
     IN_OUT();
     int T = 1;
-    // cin >> T;
+    cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {
 

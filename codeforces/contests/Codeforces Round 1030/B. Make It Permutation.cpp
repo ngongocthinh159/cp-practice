@@ -1,10 +1,9 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2118/problem/B
 */
 
 #include<bits/stdc++.h>
-using namespace std;
 
 #define nline '\n'
 #define ll long long
@@ -45,14 +44,26 @@ void pre_compute() {
     
 }
 void solve() {
-
+    int n; cin >> n;
+    cout << 2*n - 3 << nline;
+    int j = n - 1;
+    for (int i = 0; i < n; i++) {
+        int s1 = 0, s2 = j + 1, e1 = j, e2 = n - 1;
+        if (e1 - s1 + 1 >= 2) {
+            cout << i + 1 << ' ' <<  s1 + 1 << ' ' << e1 + 1 << nline;
+        }
+        if (e2 - s2 + 1 >= 2) {
+            cout << i + 1 << ' ' << s2 + 1 << ' ' << e2 + 1 << nline;
+        }
+        j--;
+    }
 }
 
 int main() {
     fastio();
     IN_OUT();
     int T = 1;
-    // cin >> T;
+    cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {
 

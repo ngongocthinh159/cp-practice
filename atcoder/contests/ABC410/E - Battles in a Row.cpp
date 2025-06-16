@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc410/tasks/abc410_e
 */
 
 #include<bits/stdc++.h>
@@ -45,7 +45,26 @@ void pre_compute() {
     
 }
 void solve() {
-
+    int n, H, M;
+    cin >> n >> H >> M;
+    int *a = new int[n + 1];
+    int *b = new int[n + 1];
+    for (int i = 1; i <= n; i++) cin >> a[i] >> b[i];
+    vector<vector<int>> dp(n + 1, vector<int>(H + 1, -1));
+    dp[0][H] = M;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) {
+        bool f = false;
+        for (int j = 0; j <= H; j++) if (dp[i][j] != -1) {
+            if (j >= a[i + 1]) 
+                maximize(dp[i + 1][j - a[i + 1]], dp[i][j]), f = true;
+            if (dp[i][j] >= b[i + 1])
+                maximize(dp[i + 1][j], dp[i][j] - b[i + 1]), f = true;
+        }
+        if (!f) break;
+        cnt++;
+    }
+    cout << cnt << nline;
 }
 
 int main() {

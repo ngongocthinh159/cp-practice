@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2113/problem/A
 */
 
 #include<bits/stdc++.h>
@@ -44,15 +44,34 @@ struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x
 void pre_compute() {
     
 }
+void cal(int &tot, int &k, int a, int x) {
+    int p = a - x;
+    int len = (k - p);
+    if (len <= 0) return;
+    int rep = len / x;
+    tot += rep;
+    k -= rep * x;
+}
+int solve2(int k, int a, int b, int x, int y) {
+    int tot = 0;
+    cal(tot, k, a, x);
+    cal(tot, k, b, y);
+    return tot;
+}
 void solve() {
+    // p + x >= a => p >= a - x
+    // k - p + 1 /} x
 
+    int k, a, b, x, y; cin >> k >> a >> b >> x >> y;
+
+    cout << max(solve2(k, a, b, x, y), solve2(k, b, a, y, x)) << nline;
 }
 
 int main() {
     fastio();
     IN_OUT();
     int T = 1;
-    // cin >> T;
+    cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {
 

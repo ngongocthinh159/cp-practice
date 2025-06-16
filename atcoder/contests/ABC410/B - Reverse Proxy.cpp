@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc410/tasks/abc410_B
 */
 
 #include<bits/stdc++.h>
@@ -44,8 +44,31 @@ struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x
 void pre_compute() {
     
 }
-void solve() {
-
+void solve() {  
+    int n, q;
+    cin >> n >> q;
+    set<pair<int,int>> S; // <cnt,box>
+    unordered_map<int,int> boxToCnt;
+    for (int i = 1; i <= n; i++) S.insert({0, i});
+    for (int i = 0; i < q; i++) {
+        int x; cin >> x;
+        if (x >= 1) {
+            int oldCnt = boxToCnt[x];
+            boxToCnt[x] = oldCnt + 1;
+            S.erase({oldCnt, x});
+            S.insert({oldCnt + 1, x});
+            cout << x << ' ';
+        } else {
+            auto p = *S.begin();
+            S.erase(S.begin());
+            int box = p.second;
+            int oldCnt = p.first;
+            boxToCnt[box] = oldCnt + 1;
+            S.insert({oldCnt + 1, box});
+            cout << box << ' ';
+        }
+    }
+    cout << nline;
 }
 
 int main() {

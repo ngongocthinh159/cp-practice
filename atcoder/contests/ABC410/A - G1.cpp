@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc410/tasks/abc410_a
 */
 
 #include<bits/stdc++.h>
@@ -45,8 +45,15 @@ void pre_compute() {
     
 }
 void solve() {
-
-}
+    int n, k;
+    cin >> n;
+    int *a = new int[n];
+    for (int i = 0; i< n; i++) cin >> a[i];
+    cin >> k;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) if (a[i] >= k) cnt++;
+    cout << cnt << nline;
+} 
 
 int main() {
     fastio();

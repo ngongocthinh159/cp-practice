@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://atcoder.jp/contests/abc410/tasks/abc410_d
 */
 
 #include<bits/stdc++.h>
@@ -39,13 +39,46 @@ freopen("Output.txt", "w", stdout);
 struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(uint64_t x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x + FIXED_RANDOM);}}; // https://codeforces.com/blog/entry/62393
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
-
-
+#define N 1005
+int n, m;
+vector<pair<int,int>> g[N];
+struct Edge {
+    int u, v, w;
+};
+Edge e[N];
 void pre_compute() {
     
 }
 void solve() {
-
+    cin >> n >> m;
+    for (int i = 0; i < m; i++) {
+        int u, v, w; cin >> u >> v >> w;
+        g[u].push_back({v, w});
+        e[i] = Edge{u, v, w};
+    }
+    // vector<vector<bool>> dist(n + 1, vector<bool>((1<<10)));
+    vector<vector<bool>> vis(n + 1, vector<bool>((1<<10)));
+    deque<pair<int,int>> q;
+    q.push_front({1, 0});
+    vis[0][0] = 1;
+    while (q.size()) {
+        auto p = q.back(); q.pop_back();
+        int u, w_u;
+        tie(u, w_u) = p;
+        for (auto [v, w_uv] : g[u]) {
+            if (!vis[v][w_u ^ w_uv]) {
+                vis[v][w_u ^ w_uv] = 1;
+                q.push_front({v, w_u ^ w_uv});
+            }
+        }
+    }
+    int nmask = (1 << 10) - 1;
+    int ans = -1;
+    for (int i = 0; i < nmask; i++) if (vis[n][i]) {
+        ans = i;
+        break;
+    }
+    cout << ans << nline;
 }
 
 int main() {
