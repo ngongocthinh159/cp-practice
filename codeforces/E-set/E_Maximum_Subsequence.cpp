@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/888/problem/E
 */
 
 #include<bits/stdc++.h>
@@ -13,8 +13,6 @@ using namespace std;
 #define LINF ((long long)1e18)
 #define IINF ((int)1e9)
 #define MASK(i) (1LL << (i))
-#define all(v) (v).begin(), (v).end()
-
 
 template<class X, class Y>
 bool minimize(X &x, const Y &y) {
@@ -42,12 +40,40 @@ struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x 
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-
+#define N 42
+int n, m;
+int a[N];
+int L[300000], R[300000], topL = 0, topR = 0;
 void pre_compute() {
     
 }
+void gen(int i, int len, int mod, int *L, int &top) {
+    if (i == len) {
+        L[top++] = mod; 
+        return;
+    }
+    gen(i + 1, len, mod, L, top);
+    gen(i + 1, len, (mod + a[i]) % m, L, top);
+}
 void solve() {
-
+    cin >> n >> m;
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int half = (n + 1)/2;
+    gen(0, half, 0, L, topL);
+    gen(half, n, 0, R, topR);
+    sort(R, R + topR);
+    int ans = 0;
+    for (int i = 0; i < topL; i++) {
+        int lmod = L[i];
+        int tar = m - lmod;
+        auto it = lower_bound(R, R + topR, tar);
+        int idx = it - R;
+        if (idx != 0) {
+            idx--;
+            ans = max(ans, lmod + R[idx]);
+        }
+    }
+    cout << ans << nline;
 }
 
 int main() {

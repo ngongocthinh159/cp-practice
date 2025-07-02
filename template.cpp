@@ -29,12 +29,12 @@ freopen("Output.txt", "w", stdout);
 #define mp make_pair
 #define fi first
 #define se second
+#define all(v) (v).begin(), (v).end()
 #define PI 3.141592653589793238462
 #define SET_BITS(x) __builtin_popcountll(x)
 #define MASK(i) (1LL << (i))
 #define BIT(x, i) (((x) >> (i)) & 1)
 #define SZ(x) ((int)(x).size())
-#define ALL(v) (v).begin(), (v).end()
 #define FOR(i, a, b) for (int i = (a), _b = (b); i <= _b; i++)
 #define FORD(i, b, a) for (int i = (b), _a = (a); i >= _a; i--)
 #define REP(i, n) for (int i = 0, _n = (n); i < _n; i++)
