@@ -1,31 +1,24 @@
-// matrix: 2D
+// Given 2D matrix
 // contain 1 or 0
 // given position [x, y] indicating index of row and col respectively
 // find the cell that has closest distance to the given cell
-
-// closest distance: mahathan distance
-
-// closest distance = K -> do bfs K-th level
+// closest distance definition: mahathan distance
 
 // Output: the nereast distance
 
 // Edge case:
 // + Not find nearest 0 => -1
-// + 
  
-
-
+// Input
 // [[0, 1, 1, 1],
-// [1, 1, [1], 1]],
-// [[0, 1, 1, 0]]
+//  [1, 1, 1, 1],
+//  [0, 1, 1, 0]]
+
+// Follow up: find nearest distance for all cell
+
 
 // Time: n * m (n is number of rows, m is number of columns)
 // Space: n * m (n is number of rows, m is number of columns)
-
-// [[0, 1, 1, 1],
-// [1, 1, 1, 1]],
-// [[0, 1, 1, 0]]
-
 #include <bits/stdc++.h>
 using namespace std;
 
