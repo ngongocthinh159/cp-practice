@@ -3,6 +3,8 @@
 .cph
 .DS_Store
 
+.idea
+
 input.txt
 output.txt
 error.txt
