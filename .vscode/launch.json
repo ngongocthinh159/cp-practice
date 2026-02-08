@@ -1,7 +1,10 @@
 {
     "version": "0.2.0",
-    "configurations": [{
-        "name": "g++.exe build and debug active file",
+    "configurations": [
+
+    // Launch task for run active file    
+    {
+        "name": "gdb: run active file",
         "type": "cppdbg",
         "request": "launch",
         "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
@@ -11,12 +14,33 @@
         "environment": [],
         "externalConsole": false, //set false to see output in integrated terminal
         "MIMode": "gdb",
-        "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe",
+        "miDebuggerPath": "${config:miDebuggerPath}",
         "setupCommands": [{
             "description": "Enable pretty-printing for gdb",
             "text": "-enable-pretty-printing",
             "ignoreFailures": true
         }],
-        "preLaunchTask": "[ThinhNgo] C/C++: g++.exe build active file"
+        "preLaunchTask": "g++: build active file for run"
+    },
+
+    // Launch task for debug active file
+    {
+        "name": "gdb: debug active file",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "miDebuggerPath": "${config:miDebuggerPath}",
+        "setupCommands": [{
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        }],
+        "preLaunchTask": "g++: build active file for debug"
     }]
 }

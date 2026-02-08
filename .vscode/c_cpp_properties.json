@@ -10,16 +10,8 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "intelliSenseMode": "windows-gcc-arm64",
-            "browse": {
-                "path": [
-                    "${workspaceFolder}"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            },
-            "compilerPath": "/opt/homebrew/bin/g++",
-            "cStandard": "c11",
+            "intelliSenseMode": "gcc-x64",
+            "cStandard": "gnu18",
             "cppStandard": "c++17"
         }
     ],

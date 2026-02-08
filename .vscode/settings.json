@@ -1,5 +1,10 @@
 {
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.intelliSenseEngineFallback": "enabled",
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "debug.onTaskErrors": "showErrors",
+
+    // Set compiler path and debugger path
+    "C_Cpp.default.compilerPath": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+    "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe"
 }
