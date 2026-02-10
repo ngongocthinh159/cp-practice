@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/293/problem/E
 */
 
 #include<bits/stdc++.h>
