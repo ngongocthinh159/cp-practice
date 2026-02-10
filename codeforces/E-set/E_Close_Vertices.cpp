@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/contest/293/problem/E
+ * Solution for: 
 */
 
 #include<bits/stdc++.h>
@@ -113,7 +113,7 @@ ll CD(int u, int p) {
     del[u] = 1;
     for (auto &[v, w] : g[u]) if (v != p && !del[v])
         ans += CD(v, u);
-    return ans / 2;
+    return ans;
 }
 void solve() {
     cin >> n >> L >> W;
@@ -123,7 +123,7 @@ void solve() {
         g[u].push_back({v, w});
         g[v].push_back({u, w});
     }
-    cout << CD(1, 0) << nline;
+    cout << (CD(1, 0) / 2) << nline;
 }
 
 int main() {
