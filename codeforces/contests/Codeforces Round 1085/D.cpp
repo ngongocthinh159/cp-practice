@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2207/problem/D
 */
 #pragma GCC optimize("O3,unroll-loops")
  
@@ -111,13 +111,40 @@ struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
 
-
-
+#define N 500005
+int n, k, root;
+vector<int> g[N];
 void pre_compute() {
 
 }
+int dfs(int u, int p) {
+    int mn1 = IINF, mn2 = IINF, child = 0;
+    for (auto v : g[u]) if (v != p) {
+        child++;
+        int a = dfs(v, u) + 1;
+        if (mn1 > a) {
+            mn2 = mn1;
+            mn1 = a;
+        } else minimize(mn2, a);
+    }
+    if (child == 0) return 0;
+    if (child == 1) return mn1;
+    if (child >= 2 && (mn1 + mn2) <= k + 1) return 0;
+    return min(mn1, mn2);
+}
 void solve() {
+    cin >> n >> k >> root;
+    for (int i = 1; i <= n - 1; i++) {
+        int u, v; cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }    
+    if (dfs(root, 0) == 0)
+        cout << "YES" << nline;
+    else
+        cout << "NO" << nline;
 
+    for (int i = 1; i <= n; i++) g[i].clear();
 }
 
 int main() {

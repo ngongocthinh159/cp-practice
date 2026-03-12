@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2207/problem/A
 */
 
 // #include<bits/stdc++.h>
@@ -48,7 +48,24 @@ void pre_compute() {
     
 }
 void solve() {
-
+    int n; cin >> n;
+    string s; cin >> s;
+    int mx = 0, mn = 0;
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '0') continue;
+        int st = i, end = i;
+        while (1) {
+            while (i < n && s[i] == '1') end = i, i++;
+            i++;
+            if (i < n && s[i] == '1') {}
+            else 
+                break;
+        }
+        int len = end - st + 1; 
+        mx += len;
+        mn += len - (len - 1)/2;
+    }
+    cout << mn << ' ' << mx << nline;
 }
 
 int main() {

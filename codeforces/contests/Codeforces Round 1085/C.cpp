@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2207/problem/C
 */
 
 // #include<bits/stdc++.h>
@@ -43,12 +43,43 @@ struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x 
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-
+#define N 2005
+ll n, h;
+ll a[N], val[N];
 void pre_compute() {
     
 }
 void solve() {
-
+    cin >> n >> h;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    if (n == 1) {
+        cout << h - a[1] << nline;
+        return;
+    }
+    a[0] = a[n + 1] = LINF;
+    for (int i = 1; i <= n; i++) {
+        ll cur = a[i], idx = i;
+        ll pref = 0, surf = 0;
+        for (int j = i - 1; j >= 0; j--) if (maximize(cur, a[j])) {
+            pref += (idx - j) * (h - a[idx]);
+            idx = j;
+        }
+        cur = a[i], idx = i;
+        for (int j = i + 1; j <= n + 1; j++) if (maximize(cur, a[j])) {
+            surf += (j - idx) * (h - a[idx]);
+            idx = j;
+        }
+        val[i] = pref + surf - (h - a[i]);
+    }
+    ll best = 0;
+    for (int i = 1; i <= n; i++) {
+        ll mx = a[i], idx = i;
+        for (int j = i - 1; j >= 1; j--) {
+            if (maximize(mx, a[j])) idx = j;
+            best = max(best, val[i] + val[j] - val[idx]);
+        }
+    }
+    cout << best << nline;
 }
 
 int main() {

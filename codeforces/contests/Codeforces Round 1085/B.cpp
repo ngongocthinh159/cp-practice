@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: 
+ * Solution for: https://codeforces.com/contest/2207/problem/B
 */
 
 // #include<bits/stdc++.h>
@@ -43,12 +43,38 @@ struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x 
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-
+#define N 200005
+int n, m, l;
+int a[N];
+int b[N];
 void pre_compute() {
     
 }
 void solve() {
+    cin >> n >> m >> l;
+    int prev = 0;
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+        int cnt = a[i] - prev;
+        while (cnt--) {
+            int mn = IINF, idx;
+            for (int j = 1; j <= min(n + 2 - i, m); j++) if (minimize(mn, b[j])) idx = j;
+            b[idx]++;
+        }
+        b[1] = 0;
+        for (int j = 1; j <= min(n + 2 - i, m); j++) b[j - 1] = b[j];
+        b[min(n + 2 - i, m)] = 0;
+        prev = a[i];
+    }
+    if (l - prev > 0) {
+        b[1] += l - prev;
+    }
 
+    cout << b[1] << nline;
+
+    for (int i = 1; i <= m; i++) {
+        b[i] = 0;
+    }
 }
 
 int main() {
