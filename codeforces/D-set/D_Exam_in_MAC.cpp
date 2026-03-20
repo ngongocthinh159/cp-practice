@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/problemset/problem/1915/G
+ * Solution for: https://codeforces.com/problemset/problem/1935/D
 */
 
 // #include<bits/stdc++.h>
@@ -44,44 +44,27 @@ struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
 
-#define N 1005
-int n, m;
-vector<array<ll,2>> g[N];
-ll s[N];
 void pre_compute() {
     
 }
-ll dijkstra(int src, int dest) {
-    priority_queue<array<ll,3>,vector<array<ll,3>>, greater<>> q;
-    vector<vector<ll>> dist(n + 1, vector<ll>(N, LINF));
-    dist[src][s[src]] = 0;
-    q.push({0, src, s[src]});
-    while (q.size()) {
-        auto [w_u, u, bike] = q.top();
-        q.pop();
-        if (w_u > dist[u][bike]) continue;
-        ll nbike = min(bike, s[u]);
-        for (auto [v, w_uv] : g[u]) if (dist[v][nbike] > w_u + w_uv * nbike) {
-            minimize(dist[v][nbike], w_u + w_uv * nbike);
-            q.push({dist[v][nbike], v, nbike});
-        }
-    }
-    ll ans = LINF;
-    for (int j = 1; j < N; j++) ans = min(ans, dist[dest][j]);
-    return ans;
-}
 void solve() {
-    cin >> n >> m;
-    for (int i = 1; i <= n; i++) g[i].clear();
-
-    for (int i = 0; i < m; i++) {
-        int u, v, w; cin >> u >> v >> w;
-        g[u].push_back({v, w});
-        g[v].push_back({u, w});
+    ll n, c; cin >> n >> c;
+    ll s[n + 1];
+    ll o = 0, e = 0;
+    for (int i = 1; i <= n; i++) {
+        cin >> s[i];
+        if (s[i]&1) o++;
+        else e++;
     }
-    for (int i = 1; i <= n; i++) cin >> s[i];
+    ll ans = (c + 1) * (c + 2) / 2;
+    for (int i = 1; i <= n; i++) {
+        ans -= s[i]/2 + 1;
+        ans -= c - s[i] + 1;
+    }
+    ans += o*(o + 1)/2;
+    ans += e*(e + 1)/2;
 
-    cout << dijkstra(1, n) << nline;
+    cout << ans << nline;
 }
 
 int main() {

@@ -1,6 +1,6 @@
 /**
  * Author: Thinh Ngo Ngoc
- * Solution for: https://codeforces.com/problemset/problem/1915/G
+ * Solution for: https://codeforces.com/problemset/problem/1528/B
 */
 
 // #include<bits/stdc++.h>
@@ -43,52 +43,38 @@ struct chash {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x 
 struct chashp {static uint64_t splitmix64(uint64_t x) {x += 0x9e3779b97f4a7c15;x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;x = (x ^ (x >> 27)) * 0x94d049bb133111eb;return x ^ (x >> 31);}size_t operator()(pair<uint64_t,uint64_t> x) const {static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);}}; // https://codeforces.com/blog/entry/62393
 /*--------------------------------------------------------------------------------------------------------------------------*/
 
-
-#define N 1005
-int n, m;
-vector<array<ll,2>> g[N];
-ll s[N];
+#define N 1000005
+int divisor[N];
 void pre_compute() {
-    
+    for (int i = 1; i < N; i++)
+        for (int j = i; j < N; j += i) divisor[j]++;
 }
-ll dijkstra(int src, int dest) {
-    priority_queue<array<ll,3>,vector<array<ll,3>>, greater<>> q;
-    vector<vector<ll>> dist(n + 1, vector<ll>(N, LINF));
-    dist[src][s[src]] = 0;
-    q.push({0, src, s[src]});
-    while (q.size()) {
-        auto [w_u, u, bike] = q.top();
-        q.pop();
-        if (w_u > dist[u][bike]) continue;
-        ll nbike = min(bike, s[u]);
-        for (auto [v, w_uv] : g[u]) if (dist[v][nbike] > w_u + w_uv * nbike) {
-            minimize(dist[v][nbike], w_u + w_uv * nbike);
-            q.push({dist[v][nbike], v, nbike});
-        }
-    }
-    ll ans = LINF;
-    for (int j = 1; j < N; j++) ans = min(ans, dist[dest][j]);
-    return ans;
+void add(int &x, int y) {
+    x += y;
+    if (x >= MOD1) x -= MOD1;
 }
 void solve() {
-    cin >> n >> m;
-    for (int i = 1; i <= n; i++) g[i].clear();
+    int n; cin >> n;
+    n = 2 * n;
+    vector<int> dp(n + 1);
+    vector<int> pref(n + 1);
+    dp[2] = 1;
+    pref[2] = 1;
+    for (int i = 4; i <= n; i += 2) {
+        add(dp[i], pref[i - 2]);
+        add(dp[i], divisor[i/2]);
 
-    for (int i = 0; i < m; i++) {
-        int u, v, w; cin >> u >> v >> w;
-        g[u].push_back({v, w});
-        g[v].push_back({u, w});
+        add(pref[i], dp[i]);
+        add(pref[i], pref[i - 2]);
     }
-    for (int i = 1; i <= n; i++) cin >> s[i];
-
-    cout << dijkstra(1, n) << nline;
+    cout << dp[n] << nline;
 }
 
 int main() {
     fastio();
     IN_OUT();
     int T = 1;
-    cin >> T;
+    // cin >> T;
     pre_compute();
     for (int cases = 1; cases <= T; cases++) {
 
