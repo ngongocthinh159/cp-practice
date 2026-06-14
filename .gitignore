@@ -26,6 +26,8 @@ bruteforce-check/
 /D2.cpp
 /E.cpp
 /F.cpp
+/F1.cpp
+/F2.cpp
 /G.cpp
 
 /a.cpp
@@ -38,6 +40,8 @@ bruteforce-check/
 /d2.cpp
 /e.cpp
 /f.cpp
+/f1.cpp
+/f2.cpp
 /g.cpp
 
 program
